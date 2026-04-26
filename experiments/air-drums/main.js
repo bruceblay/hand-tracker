@@ -1,7 +1,7 @@
 import { createHandTracker } from '../../src/tracking.js';
 import { drawHands } from '../../src/draw.js';
 import { mirrorX } from '../../src/mappings.js';
-import { PinchDetector } from '../../src/gestures.js';
+import { PinchMotionDetector } from '../../src/gestures.js';
 import { createDrums } from './audio.js';
 
 const video = document.getElementById('video');
@@ -14,9 +14,9 @@ const HISTORY = 5;
 const HIGH_LOW_Y = 0.5;
 const VELOCITY_FULL_SCALE = 0.04;
 
-const PINCH_OPTS = { closeThreshold: 0.55, openThreshold: 0.65, minInterval: 70 };
-const left = { pinch: new PinchDetector(PINCH_OPTS), yHist: [], lastResult: null };
-const right = { pinch: new PinchDetector(PINCH_OPTS), yHist: [], lastResult: null };
+const PINCH_OPTS = { minDrop: 0.18, minInterval: 70 };
+const left = { pinch: new PinchMotionDetector(PINCH_OPTS), yHist: [], lastResult: null };
+const right = { pinch: new PinchMotionDetector(PINCH_OPTS), yHist: [], lastResult: null };
 
 const flashes = { kick: 0, snare: 0, hihat: 0, crash: 0 };
 
@@ -100,7 +100,7 @@ function drawDebug() {
   ctx.textBaseline = 'bottom';
   const y = canvas.height - 14;
   const fmt = (r) => r.lastResult && r.lastResult.ratio != null
-    ? `${r.lastResult.ratio.toFixed(2)} ${r.lastResult.state}`
+    ? `${r.lastResult.ratio.toFixed(2)}${r.lastResult.closing ? ' closing' : ''}`
     : '—';
   ctx.fillStyle = 'rgba(124, 204, 255, 0.75)';
   ctx.textAlign = 'left';
