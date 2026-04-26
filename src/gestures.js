@@ -1,10 +1,12 @@
 import { distance } from './mappings.js';
 
 export class PinchDetector {
-  constructor({ closeThreshold = 0.45, openThreshold = 0.7 } = {}) {
+  constructor({ closeThreshold = 0.45, openThreshold = 0.7, minInterval = 0 } = {}) {
     this.closed = false;
     this.closeThreshold = closeThreshold;
     this.openThreshold = openThreshold;
+    this.minInterval = minInterval;
+    this.lastClosedAt = -Infinity;
   }
 
   update(landmarks) {
@@ -20,7 +22,11 @@ export class PinchDetector {
     let justClosed = false, justOpened = false;
     if (!this.closed && ratio < this.closeThreshold) {
       this.closed = true;
-      justClosed = true;
+      const now = performance.now();
+      if (now - this.lastClosedAt > this.minInterval) {
+        justClosed = true;
+        this.lastClosedAt = now;
+      }
     } else if (this.closed && ratio > this.openThreshold) {
       this.closed = false;
       justOpened = true;

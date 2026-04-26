@@ -14,9 +14,9 @@ const HISTORY = 5;
 const HIGH_LOW_Y = 0.5;
 const VELOCITY_FULL_SCALE = 0.04;
 
-const PINCH_OPTS = { closeThreshold: 0.65, openThreshold: 0.8 };
-const left = { pinch: new PinchDetector(PINCH_OPTS), yHist: [] };
-const right = { pinch: new PinchDetector(PINCH_OPTS), yHist: [] };
+const PINCH_OPTS = { closeThreshold: 0.55, openThreshold: 0.65, minInterval: 70 };
+const left = { pinch: new PinchDetector(PINCH_OPTS), yHist: [], lastResult: null };
+const right = { pinch: new PinchDetector(PINCH_OPTS), yHist: [], lastResult: null };
 
 const flashes = { kick: 0, snare: 0, hihat: 0, crash: 0 };
 
@@ -94,15 +94,32 @@ function pinchPointY(hand) {
   return (hand[4].y + hand[8].y) / 2;
 }
 
+function drawDebug() {
+  ctx.save();
+  ctx.font = '13px ui-monospace, SFMono-Regular, monospace';
+  ctx.textBaseline = 'bottom';
+  const y = canvas.height - 14;
+  const fmt = (r) => r.lastResult && r.lastResult.ratio != null
+    ? `${r.lastResult.ratio.toFixed(2)} ${r.lastResult.state}`
+    : '—';
+  ctx.fillStyle = 'rgba(124, 204, 255, 0.75)';
+  ctx.textAlign = 'left';
+  ctx.fillText(`L  ${fmt(left)}`, 14, y);
+  ctx.textAlign = 'right';
+  ctx.fillText(`${fmt(right)}  R`, canvas.width - 14, y);
+  ctx.restore();
+}
+
 function handleHand(hand, side, drums) {
   if (!hand) {
-    side.pinch.update(null);
+    side.lastResult = side.pinch.update(null);
     side.yHist.length = 0;
     return;
   }
   const py = pinchPointY(hand);
   pushY(side.yHist, py);
   const p = side.pinch.update(hand);
+  side.lastResult = p;
   if (p.justClosed) {
     const gain = velToGain(peakAbsDelta(side.yHist));
     const high = py < HIGH_LOW_Y;
@@ -146,6 +163,8 @@ async function run() {
 
         handleHand(hands.left, left, drums);
         handleHand(hands.right, right, drums);
+
+        drawDebug();
       }
     }
     requestAnimationFrame(loop);
