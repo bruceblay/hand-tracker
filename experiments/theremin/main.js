@@ -1,7 +1,7 @@
 import { createHandTracker } from '../../src/tracking.js';
 import { createAudio } from './audio.js';
 import { drawHands } from '../../src/draw.js';
-import { quantizeToScale, midiToHz, OnePole, mirrorX } from '../../src/mappings.js';
+import { quantizeToScale, midiToHz, distance, OnePole, mirrorX } from '../../src/mappings.js';
 
 const video = document.getElementById('video');
 const canvas = document.getElementById('overlay');
@@ -11,6 +11,7 @@ const ctx = canvas.getContext('2d');
 
 const pitchSmoother = new OnePole(0.3);
 const volSmoother = new OnePole(0.25);
+const filterSmoother = new OnePole(0.2, 4000);
 
 function setHud(text) { hud.textContent = text; }
 
@@ -49,7 +50,7 @@ async function run() {
   setHud('starting audio…');
   const audio = await createAudio();
 
-  setHud('left side: y = pitch. right side: y = volume.');
+  setHud('left side: y = pitch. right side: y = volume, pinch = filter.');
   audio.setVolume01(0.7);
 
   let lastTs = -1;
@@ -76,6 +77,9 @@ async function run() {
           const tip = volume[8];
           const v01 = volSmoother.process(Math.max(0, Math.min(1, 1 - tip.y)));
           audio.setVolume01(v01);
+          const pinch = distance(volume[4], volume[8]);
+          const cutoff = filterSmoother.process(200 + Math.min(1, pinch * 4) * 7800);
+          audio.setFilterHz(cutoff);
         }
       }
     }
