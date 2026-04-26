@@ -47,6 +47,27 @@ function getBlend(categories, name) {
   return categories.find(c => c.categoryName === name)?.score ?? 0;
 }
 
+function getVideoDisplayBounds() {
+  const vw = video.videoWidth;
+  const vh = video.videoHeight;
+  const cw = canvas.width;
+  const ch = canvas.height;
+  if (!vw || !vh || !cw || !ch) {
+    return { width: cw, height: ch, offsetX: 0, offsetY: 0 };
+  }
+  const videoAspect = vw / vh;
+  const canvasAspect = cw / ch;
+  if (videoAspect > canvasAspect) {
+    const height = ch;
+    const width = ch * videoAspect;
+    return { width, height, offsetX: (cw - width) / 2, offsetY: 0 };
+  } else {
+    const width = cw;
+    const height = cw / videoAspect;
+    return { width, height, offsetX: 0, offsetY: (ch - height) / 2 };
+  }
+}
+
 function setBar(key, value) {
   fillEls[key].style.width = `${Math.max(0, Math.min(1, value)) * 100}%`;
 }
@@ -79,7 +100,7 @@ async function run() {
 
         const landmarks = result.faceLandmarks?.[0];
         const mirrored = landmarks ? mirrorX(landmarks) : null;
-        drawFace(ctx, mirrored, { width: canvas.width, height: canvas.height });
+        drawFace(ctx, mirrored, getVideoDisplayBounds());
 
         const cats = result.faceBlendshapes?.[0]?.categories ?? [];
         const jaw    = jawSmoother.process(getBlend(cats, 'jawOpen'));

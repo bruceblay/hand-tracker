@@ -7,13 +7,13 @@ const HAND_CONNECTIONS = [
   [0,17]
 ];
 
-export function drawFace(ctx, landmarks, { width, height }) {
-  ctx.clearRect(0, 0, width, height);
+export function drawFace(ctx, landmarks, { width, height, offsetX = 0, offsetY = 0 }) {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   if (!landmarks || landmarks.length === 0) return;
   ctx.fillStyle = 'rgba(124, 204, 255, 0.55)';
   for (const p of landmarks) {
     ctx.beginPath();
-    ctx.arc(p.x * width, p.y * height, 2.2, 0, Math.PI * 2);
+    ctx.arc(p.x * width + offsetX, p.y * height + offsetY, 2.2, 0, Math.PI * 2);
     ctx.fill();
   }
 }
