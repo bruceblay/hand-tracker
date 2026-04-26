@@ -6,3 +6,4 @@ air drums
 - pinch sensitivity needs work
 - better snare sound
 - can't trigger left half with right hand
+- random triggers when only one hand is tracked

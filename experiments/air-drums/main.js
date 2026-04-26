@@ -64,8 +64,8 @@ function velToGain(v) {
 function drawZones() {
   const w = canvas.width, h = canvas.height;
   ctx.save();
-  ctx.strokeStyle = 'rgba(124, 204, 255, 0.12)';
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(124, 204, 255, 0.18)';
+  ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(0, h * 0.5); ctx.lineTo(w, h * 0.5);
   ctx.moveTo(w * 0.5, 0); ctx.lineTo(w * 0.5, h);
@@ -83,7 +83,7 @@ function drawZones() {
   ];
   for (const l of labels) {
     const f = flashes[l.key];
-    ctx.fillStyle = `rgba(124, 204, 255, ${0.25 + f * 0.7})`;
+    ctx.fillStyle = `rgba(124, 204, 255, ${0.16 + f * 0.7})`;
     ctx.fillText(l.text, l.x, l.y);
     if (f > 0) flashes[l.key] = Math.max(0, f - 0.07);
   }
@@ -158,7 +158,11 @@ async function run() {
         lastTs = ts;
         const hands = pickHands(result);
 
-        drawHands(ctx, hands.all, { width: canvas.width, height: canvas.height });
+        drawHands(ctx, hands.all, {
+          width: canvas.width, height: canvas.height,
+          lineColor: 'rgba(124, 204, 255, 0.55)',
+          dotColor: 'rgba(255, 255, 255, 0.55)'
+        });
         drawZones();
 
         handleHand(hands.left, left, drums);

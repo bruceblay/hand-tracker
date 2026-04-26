@@ -7,11 +7,15 @@ const HAND_CONNECTIONS = [
   [0,17]
 ];
 
-export function drawHands(ctx, hands, { width, height }) {
+export function drawHands(ctx, hands, {
+  width, height,
+  lineColor = '#7cf', dotColor = '#fff',
+  lineWidth = 2, dotRadius = 3
+}) {
   ctx.clearRect(0, 0, width, height);
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = '#7cf';
-  ctx.fillStyle = '#fff';
+  ctx.lineWidth = lineWidth;
+  ctx.strokeStyle = lineColor;
+  ctx.fillStyle = dotColor;
 
   for (const landmarks of hands) {
     ctx.beginPath();
@@ -24,7 +28,7 @@ export function drawHands(ctx, hands, { width, height }) {
 
     for (const p of landmarks) {
       ctx.beginPath();
-      ctx.arc(p.x * width, p.y * height, 3, 0, Math.PI * 2);
+      ctx.arc(p.x * width, p.y * height, dotRadius, 0, Math.PI * 2);
       ctx.fill();
     }
   }
