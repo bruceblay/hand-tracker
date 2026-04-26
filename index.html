@@ -7,25 +7,77 @@
     <style>
       :root { color-scheme: dark; }
       html, body { margin: 0; min-height: 100%; background: #0a0a0a; color: #eaeaea; font-family: ui-sans-serif, system-ui, sans-serif; }
-      main { max-width: 720px; margin: 0 auto; padding: 64px 24px; }
+
+      #video, #overlay, #cursor { position: fixed; pointer-events: none; }
+      #video {
+        inset: 0; width: 100vw; height: 100vh;
+        object-fit: cover;
+        transform: scaleX(-1);
+        filter: brightness(0.2) saturate(0.4);
+        z-index: 0;
+        display: none;
+      }
+      #overlay {
+        inset: 0; width: 100vw; height: 100vh;
+        z-index: 1;
+        opacity: 0.55;
+        display: none;
+      }
+      body.hand-mode #video, body.hand-mode #overlay { display: block; }
+
+      #cursor {
+        left: 0; top: 0;
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        border: 2px solid #7cf;
+        background: rgba(124, 204, 255, 0.18);
+        margin-left: -14px; margin-top: -14px;
+        z-index: 3;
+        transition: background-color 100ms, border-color 100ms;
+        display: none;
+      }
+      body.hand-mode #cursor { display: block; }
+      body.hand-mode #cursor.hidden { display: none; }
+      #cursor.pinched { background: rgba(124, 204, 255, 0.55); border-color: #fff; }
+
+      main {
+        position: relative; z-index: 2;
+        max-width: 720px; margin: 0 auto; padding: 64px 24px;
+      }
       h1 { font-weight: 600; font-size: 28px; margin: 0 0 8px; }
       p.lede { color: #999; margin: 0 0 40px; }
       ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
       a.card {
         display: block; padding: 18px 20px; border-radius: 10px;
-        background: #151515; color: inherit; text-decoration: none;
-        border: 1px solid #222; transition: border-color 120ms, transform 120ms;
+        background: rgba(21, 21, 21, 0.85); color: inherit; text-decoration: none;
+        border: 1px solid #222;
+        transition: border-color 120ms, transform 120ms, background-color 120ms;
+        backdrop-filter: blur(8px);
       }
-      a.card:hover { border-color: #7cf; transform: translateY(-1px); }
+      a.card:hover, a.card.hover {
+        border-color: #7cf; transform: translateY(-1px);
+        background: rgba(26, 31, 37, 0.9);
+      }
       .title { font-weight: 600; margin-bottom: 4px; }
       .desc { color: #999; font-size: 14px; }
       .tag { display: inline-block; font-size: 11px; color: #7cf; margin-left: 8px; }
+
+      #enable {
+        position: fixed; right: 20px; bottom: 20px; z-index: 5;
+        background: #151515; color: #eaeaea; border: 1px solid #333;
+        padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;
+      }
+      #enable[hidden] { display: none; }
+      body.hand-mode #enable { display: none; }
     </style>
   </head>
   <body>
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="overlay"></canvas>
+    <div id="cursor"></div>
     <main>
       <h1>hand-tracker</h1>
-      <p class="lede">webcam-driven musical experiments. requires a webcam and a click to start audio.</p>
+      <p class="lede">webcam-driven musical experiments. click "enable hand control" to navigate by pinching.</p>
       <ul>
         <li>
           <a class="card" href="/experiments/theremin/">
@@ -35,5 +87,7 @@
         </li>
       </ul>
     </main>
+    <button id="enable">enable hand control</button>
+    <script type="module" src="/main.js"></script>
   </body>
 </html>

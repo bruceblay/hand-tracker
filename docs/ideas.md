@@ -1,0 +1,8 @@
+- ochestra conductor
+- watery liquid effect that follows hand movements - trippy
+- paint/draw
+- landing page where you have to pinch over each button to click into subpage
+- grapher based on hand motions.  live draw the chart
+- knob twister
+- big kaoss pad
+- 
