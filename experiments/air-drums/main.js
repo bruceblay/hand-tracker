@@ -20,7 +20,7 @@ const right = { pinch: new PinchDetector(PINCH_OPTS), yHist: [], lastResult: nul
 
 const flashes = { kick: 0, snare: 0, hihat: 0, crash: 0 };
 
-function setHud(text) { hud.textContent = text; }
+function setHud(text) { hud.textContent = text; hud.hidden = !text; }
 
 function resizeCanvas() {
   canvas.width = canvas.clientWidth;
@@ -179,5 +179,3 @@ startBtn.addEventListener('click', () => {
     startBtn.hidden = false;
   });
 });
-
-setHud('click to start');

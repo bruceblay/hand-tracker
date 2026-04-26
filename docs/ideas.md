@@ -5,4 +5,7 @@
 - grapher based on hand motions.  live draw the chart
 - knob twister
 - big kaoss pad
+- emoji overlays that match hand shapes or face
+- two turntable and crossfader mixer ui
+- tetris
 - 
