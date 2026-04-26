@@ -103,7 +103,7 @@ async function run() {
         drawFace(ctx, mirrored, getVideoDisplayBounds());
 
         const cats = result.faceBlendshapes?.[0]?.categories ?? [];
-        const jaw    = jawSmoother.process(getBlend(cats, 'jawOpen'));
+        const jaw    = jawSmoother.process(Math.min(1, getBlend(cats, 'jawOpen') / 0.75));
         const brow   = browSmoother.process(getBlend(cats, 'browInnerUp'));
         const smile  = smileSmoother.process(
           (getBlend(cats, 'mouthSmileLeft') + getBlend(cats, 'mouthSmileRight')) / 2
