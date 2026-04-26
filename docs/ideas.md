@@ -8,4 +8,7 @@
 - emoji overlays that match hand shapes or face
 - two turntable and crossfader mixer ui
 - tetris
+- juggling game
+- hi five simulator
+- secret handshake password input
 - 
