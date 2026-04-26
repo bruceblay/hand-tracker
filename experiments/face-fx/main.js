@@ -111,7 +111,7 @@ async function run() {
         const pucker = puckerSmoother.process(
           (getBlend(cats, 'mouthFunnel') + getBlend(cats, 'mouthPucker')) / 2
         );
-        const cheek  = cheekSmoother.process(getBlend(cats, 'cheekPuff'));
+        const cheek  = cheekSmoother.process(Math.min(1, getBlend(cats, 'cheekPuff') * 3));
         const pan    = panSmoother.process(
           getBlend(cats, 'mouthRight') - getBlend(cats, 'mouthLeft')
         );
