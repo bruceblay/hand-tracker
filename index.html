@@ -6,34 +6,34 @@
     <title>hand-tracker</title>
     <style>
       :root { color-scheme: dark; }
-      html, body { margin: 0; height: 100%; background: #0a0a0a; color: #eaeaea; font-family: ui-sans-serif, system-ui, sans-serif; }
-      #stage { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
-      #video, #overlay {
-        position: absolute; inset: 0; width: 100%; height: 100%;
-        object-fit: cover;
+      html, body { margin: 0; min-height: 100%; background: #0a0a0a; color: #eaeaea; font-family: ui-sans-serif, system-ui, sans-serif; }
+      main { max-width: 720px; margin: 0 auto; padding: 64px 24px; }
+      h1 { font-weight: 600; font-size: 28px; margin: 0 0 8px; }
+      p.lede { color: #999; margin: 0 0 40px; }
+      ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+      a.card {
+        display: block; padding: 18px 20px; border-radius: 10px;
+        background: #151515; color: inherit; text-decoration: none;
+        border: 1px solid #222; transition: border-color 120ms, transform 120ms;
       }
-      #video { transform: scaleX(-1); }
-      #hud {
-        position: absolute; left: 12px; top: 12px;
-        font-size: 12px; line-height: 1.4;
-        background: rgba(0,0,0,0.45); padding: 8px 10px; border-radius: 6px;
-        pointer-events: none;
-      }
-      #start {
-        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-        padding: 14px 22px; font-size: 16px; border-radius: 8px;
-        background: #eaeaea; color: #0a0a0a; border: none; cursor: pointer;
-      }
-      #start[hidden] { display: none; }
+      a.card:hover { border-color: #7cf; transform: translateY(-1px); }
+      .title { font-weight: 600; margin-bottom: 4px; }
+      .desc { color: #999; font-size: 14px; }
+      .tag { display: inline-block; font-size: 11px; color: #7cf; margin-left: 8px; }
     </style>
   </head>
   <body>
-    <div id="stage">
-      <video id="video" autoplay playsinline muted></video>
-      <canvas id="overlay"></canvas>
-      <div id="hud">loading…</div>
-      <button id="start">click to start</button>
-    </div>
-    <script type="module" src="/src/main.js"></script>
+    <main>
+      <h1>hand-tracker</h1>
+      <p class="lede">webcam-driven musical experiments. requires a webcam and a click to start audio.</p>
+      <ul>
+        <li>
+          <a class="card" href="/experiments/theremin/">
+            <div class="title">theremin <span class="tag">hands</span></div>
+            <div class="desc">left hand: pitch and volume on a C-minor pentatonic. right hand: pinch to open the filter.</div>
+          </a>
+        </li>
+      </ul>
+    </main>
   </body>
 </html>
