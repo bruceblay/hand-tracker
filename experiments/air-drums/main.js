@@ -158,11 +158,7 @@ async function run() {
         lastTs = ts;
         const hands = pickHands(result);
 
-        drawHands(ctx, hands.all, {
-          width: canvas.width, height: canvas.height,
-          lineColor: 'rgba(124, 204, 255, 0.55)',
-          dotColor: 'rgba(255, 255, 255, 0.55)'
-        });
+        drawHands(ctx, hands.all, { width: canvas.width, height: canvas.height });
         drawZones();
 
         handleHand(hands.left, left, drums);
