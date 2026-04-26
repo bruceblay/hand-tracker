@@ -64,7 +64,7 @@ function velToGain(v) {
 function drawZones() {
   const w = canvas.width, h = canvas.height;
   ctx.save();
-  ctx.strokeStyle = 'rgba(124, 204, 255, 0.18)';
+  ctx.strokeStyle = 'rgba(124, 204, 255, 0.28)';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(0, h * 0.5); ctx.lineTo(w, h * 0.5);
