@@ -10,7 +10,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: resolve(here, 'index.html'),
-        theremin: resolve(here, 'experiments/theremin/index.html')
+        theremin: resolve(here, 'experiments/theremin/index.html'),
+        airDrums: resolve(here, 'experiments/air-drums/index.html')
       }
     }
   }

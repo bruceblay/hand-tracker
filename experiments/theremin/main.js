@@ -1,5 +1,5 @@
 import { createHandTracker } from '../../src/tracking.js';
-import { createAudio } from '../../src/audio.js';
+import { createAudio } from './audio.js';
 import { drawHands } from '../../src/draw.js';
 import { quantizeToScale, midiToHz, distance, OnePole, mirrorX } from '../../src/mappings.js';
 
