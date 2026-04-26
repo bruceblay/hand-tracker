@@ -68,7 +68,7 @@ function computeCheekPuff(landmarks) {
     cheekBaseline = cheekBaselineSum / cheekBaselineCount;
     return 0;
   }
-  return Math.max(0, Math.min(1, (ratio - cheekBaseline) * 10));
+  return Math.max(0, Math.min(1, (ratio - cheekBaseline) * 18));
 }
 
 function getVideoDisplayBounds() {
@@ -132,9 +132,8 @@ async function run() {
         const smile  = smileSmoother.process(
           (getBlend(cats, 'mouthSmileLeft') + getBlend(cats, 'mouthSmileRight')) / 2
         );
-        const pucker = puckerSmoother.process(
-          (getBlend(cats, 'mouthFunnel') + getBlend(cats, 'mouthPucker')) / 2
-        );
+        const rawPucker = (getBlend(cats, 'mouthFunnel') + getBlend(cats, 'mouthPucker')) / 2;
+        const pucker = puckerSmoother.process(Math.max(0, (rawPucker - 0.2) / 0.8));
         const cheek  = cheekSmoother.process(computeCheekPuff(landmarks));
         const pan    = panSmoother.process(
           getBlend(cats, 'mouthRight') - getBlend(cats, 'mouthLeft')
