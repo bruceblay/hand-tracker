@@ -1,7 +1,7 @@
 import { createHandTracker } from '../../src/tracking.js';
 import { createAudio } from './audio.js';
 import { drawHands } from '../../src/draw.js';
-import { quantizeToScale, midiToHz, distance, OnePole, mirrorX } from '../../src/mappings.js';
+import { quantizeToScale, midiToHz, OnePole, mirrorX } from '../../src/mappings.js';
 
 const video = document.getElementById('video');
 const canvas = document.getElementById('overlay');
@@ -11,7 +11,6 @@ const ctx = canvas.getContext('2d');
 
 const pitchSmoother = new OnePole(0.3);
 const volSmoother = new OnePole(0.25);
-const filterSmoother = new OnePole(0.2, 4000);
 
 function setHud(text) { hud.textContent = text; }
 
@@ -33,7 +32,7 @@ async function startCamera() {
 function pickHands(result) {
   const hands = (result.landmarks ?? []).map(mirrorX);
   hands.sort((a, b) => a[0].x - b[0].x);
-  return { pitch: hands[0] ?? null, filter: hands[1] ?? null, all: hands };
+  return { pitch: hands[0] ?? null, volume: hands[1] ?? null, all: hands };
 }
 
 async function run() {
@@ -50,7 +49,8 @@ async function run() {
   setHud('starting audio…');
   const audio = await createAudio();
 
-  setHud('left side of screen = pitch/volume. right side = pinch to open filter.');
+  setHud('left side: y = pitch. right side: y = volume.');
+  audio.setVolume01(0.7);
 
   let lastTs = -1;
   const loop = () => {
@@ -59,25 +59,23 @@ async function run() {
       if (ts !== lastTs) {
         const result = tracker.detect(video, ts);
         lastTs = ts;
-        const { pitch, filter, all } = pickHands(result);
+        const { pitch, volume, all } = pickHands(result);
 
         drawHands(ctx, all, { width: canvas.width, height: canvas.height });
 
         if (pitch) {
           const tip = pitch[8];
-          const p01 = pitchSmoother.process(Math.max(0, Math.min(1, tip.x)));
-          const v01 = volSmoother.process(Math.max(0, Math.min(1, 1 - tip.y)));
+          const p01 = pitchSmoother.process(Math.max(0, Math.min(1, 1 - tip.y)));
           audio.setPitchHz(midiToHz(quantizeToScale(p01)));
-          audio.setVolume01(v01);
           audio.noteOn();
         } else {
           audio.noteOff();
         }
 
-        if (filter) {
-          const pinch = distance(filter[4], filter[8]);
-          const cutoff = filterSmoother.process(200 + Math.min(1, pinch * 4) * 7800);
-          audio.setFilterHz(cutoff);
+        if (volume) {
+          const tip = volume[8];
+          const v01 = volSmoother.process(Math.max(0, Math.min(1, 1 - tip.y)));
+          audio.setVolume01(v01);
         }
       }
     }
