@@ -14,11 +14,17 @@ const fillEls = {
   jawOpen:    panel.querySelector('[data-id="jawOpen"] .panel-fill'),
   browInner:  panel.querySelector('[data-id="browInner"] .panel-fill'),
   smile:      panel.querySelector('[data-id="smile"] .panel-fill'),
+  pucker:     panel.querySelector('[data-id="pucker"] .panel-fill'),
+  cheekPuff:  panel.querySelector('[data-id="cheekPuff"] .panel-fill'),
+  pan:        panel.querySelector('[data-id="pan"] .panel-fill'),
 };
 
 const jawSmoother = new OnePole(0.3);
 const browSmoother = new OnePole(0.25);
 const smileSmoother = new OnePole(0.25);
+const puckerSmoother = new OnePole(0.25);
+const cheekSmoother = new OnePole(0.25);
+const panSmoother = new OnePole(0.3);
 
 function setHud(text) { hud.textContent = text; hud.hidden = !text; }
 
@@ -60,7 +66,7 @@ async function run() {
   const audio = await createFaceFx();
   audio.start();
 
-  setHud('open mouth = filter. brows up = reverb. smile = distortion.');
+  setHud('jaw=filter, brows=reverb, smile=distortion, pucker=vibrato, cheeks=delay, mouth L/R=pan.');
   panel.hidden = false;
 
   let lastTs = -1;
@@ -81,14 +87,27 @@ async function run() {
         const smile  = smileSmoother.process(
           (getBlend(cats, 'mouthSmileLeft') + getBlend(cats, 'mouthSmileRight')) / 2
         );
+        const pucker = puckerSmoother.process(
+          (getBlend(cats, 'mouthFunnel') + getBlend(cats, 'mouthPucker')) / 2
+        );
+        const cheek  = cheekSmoother.process(getBlend(cats, 'cheekPuff'));
+        const pan    = panSmoother.process(
+          getBlend(cats, 'mouthRight') - getBlend(cats, 'mouthLeft')
+        );
 
         audio.setFilterHz(200 * Math.pow(40, jaw));
         audio.setReverbWet(brow);
         audio.setDistortionWet(smile);
+        audio.setVibratoWet(pucker);
+        audio.setDelayWet(cheek * 0.6);
+        audio.setPan(pan);
 
         setBar('jawOpen', jaw);
         setBar('browInner', brow);
         setBar('smile', smile);
+        setBar('pucker', pucker);
+        setBar('cheekPuff', cheek);
+        setBar('pan', (pan + 1) / 2);
       }
     }
     requestAnimationFrame(loop);
