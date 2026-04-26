@@ -94,6 +94,10 @@ function pinchPointY(hand) {
   return (hand[4].y + hand[8].y) / 2;
 }
 
+function pinchPointX(hand) {
+  return (hand[4].x + hand[8].x) / 2;
+}
+
 function drawDebug() {
   ctx.save();
   ctx.font = '13px ui-monospace, SFMono-Regular, monospace';
@@ -123,13 +127,11 @@ function handleHand(hand, side, drums) {
   if (p.justClosed) {
     const gain = velToGain(peakAbsDelta(side.yHist));
     const high = py < HIGH_LOW_Y;
-    if (side === left) {
-      if (high) { drums.hihat(gain); flashes.hihat = 1; }
-      else      { drums.kick(gain);  flashes.kick = 1; }
-    } else {
-      if (high) { drums.crash(gain); flashes.crash = 1; }
-      else      { drums.snare(gain); flashes.snare = 1; }
-    }
+    const rightHalf = pinchPointX(hand) > 0.5;
+    if (high && !rightHalf)      { drums.hihat(gain); flashes.hihat = 1; }
+    else if (high && rightHalf)  { drums.crash(gain); flashes.crash = 1; }
+    else if (!high && !rightHalf){ drums.kick(gain);  flashes.kick = 1; }
+    else                         { drums.snare(gain); flashes.snare = 1; }
   }
 }
 
