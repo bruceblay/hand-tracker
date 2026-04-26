@@ -32,6 +32,9 @@ export async function createAudio() {
     },
     setFilterHz(hz) {
       filter.frequency.rampTo(hz, 0.05);
+    },
+    setFilterQ(q) {
+      filter.Q.rampTo(q, 0.05);
     }
   };
 }

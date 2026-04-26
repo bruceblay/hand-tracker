@@ -1,7 +1,7 @@
 import { createHandTracker } from '../../src/tracking.js';
 import { createAudio } from './audio.js';
 import { drawHands } from '../../src/draw.js';
-import { quantizeToScale, midiToHz, distance, OnePole, mirrorX } from '../../src/mappings.js';
+import { quantizeToScale, midiToHz, OnePole, mirrorX } from '../../src/mappings.js';
 
 const video = document.getElementById('video');
 const canvas = document.getElementById('overlay');
@@ -12,6 +12,7 @@ const ctx = canvas.getContext('2d');
 const pitchSmoother = new OnePole(0.3);
 const volSmoother = new OnePole(0.25);
 const filterSmoother = new OnePole(0.2, 4000);
+const resonanceSmoother = new OnePole(0.2, 1);
 
 function setHud(text) { hud.textContent = text; }
 
@@ -50,7 +51,7 @@ async function run() {
   setHud('starting audio…');
   const audio = await createAudio();
 
-  setHud('left side: y = pitch. right side: y = volume, pinch = filter.');
+  setHud('left side: y = pitch, x = filter cutoff. right side: y = volume, x = resonance.');
   audio.setVolume01(0.7);
 
   let lastTs = -1;
@@ -68,6 +69,9 @@ async function run() {
           const tip = pitch[8];
           const p01 = pitchSmoother.process(Math.max(0, Math.min(1, 1 - tip.y)));
           audio.setPitchHz(midiToHz(quantizeToScale(p01)));
+          const x = Math.max(0, Math.min(1, tip.x));
+          const cutoff = filterSmoother.process(200 * Math.pow(40, x));
+          audio.setFilterHz(cutoff);
           audio.noteOn();
         } else {
           audio.noteOff();
@@ -77,9 +81,9 @@ async function run() {
           const tip = volume[8];
           const v01 = volSmoother.process(Math.max(0, Math.min(1, 1 - tip.y)));
           audio.setVolume01(v01);
-          const pinch = distance(volume[4], volume[8]);
-          const cutoff = filterSmoother.process(200 + Math.min(1, pinch * 4) * 7800);
-          audio.setFilterHz(cutoff);
+          const x = Math.max(0, Math.min(1, tip.x));
+          const q = resonanceSmoother.process(x * 12);
+          audio.setFilterQ(q);
         }
       }
     }
