@@ -13,7 +13,7 @@ export function drawFace(ctx, landmarks, { width, height }) {
   ctx.fillStyle = 'rgba(124, 204, 255, 0.55)';
   for (const p of landmarks) {
     ctx.beginPath();
-    ctx.arc(p.x * width, p.y * height, 1.6, 0, Math.PI * 2);
+    ctx.arc(p.x * width, p.y * height, 2.2, 0, Math.PI * 2);
     ctx.fill();
   }
 }
