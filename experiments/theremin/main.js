@@ -51,7 +51,7 @@ async function run() {
   setHud('starting audio…');
   const audio = await createAudio();
 
-  setHud('left side: y = pitch, x = filter cutoff. right side: y = volume, x = resonance.');
+  setHud('left side: y = pitch, x = resonance. right side: y = volume, x = filter cutoff.');
   audio.setVolume01(0.7);
 
   let lastTs = -1;
@@ -70,8 +70,8 @@ async function run() {
           const p01 = pitchSmoother.process(Math.max(0, Math.min(1, 1 - tip.y)));
           audio.setPitchHz(midiToHz(quantizeToScale(p01)));
           const x = Math.max(0, Math.min(1, tip.x));
-          const cutoff = filterSmoother.process(200 * Math.pow(40, x));
-          audio.setFilterHz(cutoff);
+          const q = resonanceSmoother.process(x * 12);
+          audio.setFilterQ(q);
           audio.noteOn();
         } else {
           audio.noteOff();
@@ -82,8 +82,8 @@ async function run() {
           const v01 = volSmoother.process(Math.max(0, Math.min(1, 1 - tip.y)));
           audio.setVolume01(v01);
           const x = Math.max(0, Math.min(1, tip.x));
-          const q = resonanceSmoother.process(x * 12);
-          audio.setFilterQ(q);
+          const cutoff = filterSmoother.process(200 * Math.pow(40, x));
+          audio.setFilterHz(cutoff);
         }
       }
     }
