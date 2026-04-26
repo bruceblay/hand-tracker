@@ -12,17 +12,21 @@ export async function createDrums() {
     envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }
   }).connect(compressor);
 
+  const snareNoiseFilter = new Tone.Filter({ frequency: 1800, type: 'highpass', Q: 0.8 }).connect(compressor);
+  const snareBodyFilter = new Tone.Filter({ frequency: 400, type: 'lowpass', Q: 1 }).connect(compressor);
+
   const snareNoise = new Tone.NoiseSynth({
     noise: { type: 'white' },
-    envelope: { attack: 0.001, decay: 0.18, sustain: 0 }
-  }).connect(compressor);
+    envelope: { attack: 0.001, decay: 0.13, sustain: 0 }
+  }).connect(snareNoiseFilter);
 
   const snareTone = new Tone.MembraneSynth({
-    pitchDecay: 0.008,
+    pitchDecay: 0.04,
     octaves: 2,
-    envelope: { attack: 0.001, decay: 0.05, sustain: 0 }
-  }).connect(compressor);
-  snareTone.volume.value = -8;
+    oscillator: { type: 'triangle' },
+    envelope: { attack: 0.001, decay: 0.07, sustain: 0, release: 0.05 }
+  }).connect(snareBodyFilter);
+  snareTone.volume.value = -6;
 
   const hihat = new Tone.MetalSynth({
     envelope: { attack: 0.001, decay: 0.05, release: 0.01 },
@@ -50,8 +54,8 @@ export async function createDrums() {
     },
     snare(vel = 1) {
       const v = clamp(vel);
-      snareNoise.triggerAttackRelease('16n', undefined, v);
-      snareTone.triggerAttackRelease('200', '32n', undefined, v * 0.6);
+      snareNoise.triggerAttackRelease('8n', undefined, v);
+      snareTone.triggerAttackRelease(160, '16n', undefined, v * 0.55);
     },
     hihat(vel = 1) {
       hihat.triggerAttackRelease(200, '32n', undefined, clamp(vel));
