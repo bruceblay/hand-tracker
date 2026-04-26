@@ -20,6 +20,11 @@ const right = { pinch: new PinchMotionDetector(PINCH_OPTS), yHist: [], lastResul
 
 const flashes = { kick: 0, snare: 0, hihat: 0, crash: 0 };
 
+const ripples = [];
+const RIPPLE_DURATION = 600;
+const RIPPLE_MIN_RADIUS = 8;
+const RIPPLE_MAX_RADIUS = 140;
+
 function setHud(text) { hud.textContent = text; hud.hidden = !text; }
 
 function resizeCanvas() {
@@ -98,6 +103,29 @@ function pinchPointX(hand) {
   return (hand[4].x + hand[8].x) / 2;
 }
 
+function spawnRipple(x, y) {
+  ripples.push({ x, y, t0: performance.now() });
+}
+
+function drawRipples() {
+  const now = performance.now();
+  for (let i = ripples.length - 1; i >= 0; i--) {
+    if (now - ripples[i].t0 >= RIPPLE_DURATION) ripples.splice(i, 1);
+  }
+  ctx.save();
+  ctx.lineWidth = 2;
+  for (const r of ripples) {
+    const progress = (now - r.t0) / RIPPLE_DURATION;
+    const radius = RIPPLE_MIN_RADIUS + (RIPPLE_MAX_RADIUS - RIPPLE_MIN_RADIUS) * Math.pow(progress, 0.7);
+    const opacity = (1 - Math.pow(progress, 2)) * 0.85;
+    ctx.strokeStyle = `rgba(124, 204, 255, ${opacity})`;
+    ctx.beginPath();
+    ctx.arc(r.x * canvas.width, r.y * canvas.height, radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function drawDebug() {
   ctx.save();
   ctx.font = '13px ui-monospace, SFMono-Regular, monospace';
@@ -126,12 +154,14 @@ function handleHand(hand, side, drums) {
   side.lastResult = p;
   if (p.justClosed) {
     const gain = velToGain(peakAbsDelta(side.yHist));
+    const px = pinchPointX(hand);
     const high = py < HIGH_LOW_Y;
-    const rightHalf = pinchPointX(hand) > 0.5;
+    const rightHalf = px > 0.5;
     if (high && !rightHalf)      { drums.hihat(gain); flashes.hihat = 1; }
     else if (high && rightHalf)  { drums.crash(gain); flashes.crash = 1; }
     else if (!high && !rightHalf){ drums.kick(gain);  flashes.kick = 1; }
     else                         { drums.snare(gain); flashes.snare = 1; }
+    spawnRipple(px, py);
   }
 }
 
@@ -166,6 +196,7 @@ async function run() {
         handleHand(hands.left, left, drums);
         handleHand(hands.right, right, drums);
 
+        drawRipples();
         drawDebug();
       }
     }
