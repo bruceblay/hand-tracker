@@ -80,8 +80,8 @@ function drawZones() {
   const labels = [
     { text: 'HI-HAT', key: 'hihat', x: w * 0.25, y: h * 0.25 },
     { text: 'CRASH',  key: 'crash', x: w * 0.75, y: h * 0.25 },
-    { text: 'KICK',   key: 'kick',  x: w * 0.25, y: h * 0.75 },
-    { text: 'SNARE',  key: 'snare', x: w * 0.75, y: h * 0.75 },
+    { text: 'SNARE',  key: 'snare', x: w * 0.25, y: h * 0.75 },
+    { text: 'KICK',   key: 'kick',  x: w * 0.75, y: h * 0.75 },
   ];
   for (const l of labels) {
     const f = flashes[l.key];
@@ -142,8 +142,8 @@ function handleHand(hand, side, drums) {
     const rightHalf = px > 0.5;
     if (high && !rightHalf)      { drums.hihat(gain); flashes.hihat = 1; }
     else if (high && rightHalf)  { drums.crash(gain); flashes.crash = 1; }
-    else if (!high && !rightHalf){ drums.kick(gain);  flashes.kick = 1; }
-    else                         { drums.snare(gain); flashes.snare = 1; }
+    else if (!high && !rightHalf){ drums.snare(gain); flashes.snare = 1; }
+    else                         { drums.kick(gain);  flashes.kick = 1; }
     spawnRipple(px, py);
   }
 }

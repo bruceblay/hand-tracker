@@ -4,7 +4,6 @@ theremin
 - add settings like triangle, square wave
 
 air drums
-- pinch sensitivity needs work
 - better snare sound
-- can't trigger left half with right hand
-- random triggers when only one hand is tracked
+- record 
+- ability to change samples
