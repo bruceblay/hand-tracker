@@ -15,7 +15,7 @@ const fillEls = {
   browInner:  panel.querySelector('[data-id="browInner"] .panel-fill'),
   smile:      panel.querySelector('[data-id="smile"] .panel-fill'),
   pucker:     panel.querySelector('[data-id="pucker"] .panel-fill'),
-  eyeWide:    panel.querySelector('[data-id="eyeWide"] .panel-fill'),
+  squint:     panel.querySelector('[data-id="squint"] .panel-fill'),
   pan:        panel.querySelector('[data-id="pan"] .panel-fill'),
 };
 
@@ -23,7 +23,7 @@ const jawSmoother = new OnePole(0.3);
 const browSmoother = new OnePole(0.25);
 const smileSmoother = new OnePole(0.25);
 const puckerSmoother = new OnePole(0.25);
-const eyeWideSmoother = new OnePole(0.25);
+const squintSmoother = new OnePole(0.25);
 const panSmoother = new OnePole(0.3);
 
 function setHud(text) { hud.textContent = text; hud.hidden = !text; }
@@ -87,7 +87,7 @@ async function run() {
   const audio = await createFaceFx();
   audio.start();
 
-  setHud('jaw=filter, brows=reverb, smile=distortion, pucker=vibrato, wide eyes=bitcrush, mouth L/R=pan.');
+  setHud('jaw=filter, brows=reverb, smile=distortion, pucker=vibrato, squint=bitcrush, mouth L/R=pan.');
   panel.hidden = false;
 
   let lastTs = -1;
@@ -110,8 +110,8 @@ async function run() {
         );
         const rawPucker = (getBlend(cats, 'mouthFunnel') + getBlend(cats, 'mouthPucker')) / 2;
         const pucker = puckerSmoother.process(Math.max(0, (rawPucker - 0.2) / 0.8));
-        const eyeWide = eyeWideSmoother.process(
-          (getBlend(cats, 'eyeWideLeft') + getBlend(cats, 'eyeWideRight')) / 2
+        const squint = squintSmoother.process(
+          (getBlend(cats, 'eyeSquintLeft') + getBlend(cats, 'eyeSquintRight')) / 2
         );
         const pan    = panSmoother.process(
           getBlend(cats, 'mouthRight') - getBlend(cats, 'mouthLeft')
@@ -121,14 +121,14 @@ async function run() {
         audio.setReverbWet(brow);
         audio.setDistortionWet(smile);
         audio.setVibratoWet(pucker);
-        audio.setBitCrushWet(eyeWide);
+        audio.setBitCrushWet(squint);
         audio.setPan(pan);
 
         setBar('jawOpen', jaw);
         setBar('browInner', brow);
         setBar('smile', smile);
         setBar('pucker', pucker);
-        setBar('eyeWide', eyeWide);
+        setBar('squint', squint);
         setBar('pan', (pan + 1) / 2);
       }
     }
