@@ -47,6 +47,30 @@ function getBlend(categories, name) {
   return categories.find(c => c.categoryName === name)?.score ?? 0;
 }
 
+const CHEEK_BASELINE_FRAMES = 60;
+let cheekBaselineSum = 0;
+let cheekBaselineCount = 0;
+let cheekBaseline = null;
+
+function computeCheekPuff(landmarks) {
+  if (!landmarks || landmarks.length < 400) return 0;
+  const lc = landmarks[50], rc = landmarks[280];
+  const le = landmarks[33], re = landmarks[263];
+  if (!lc || !rc || !le || !re) return 0;
+  const cheekDist = Math.hypot(rc.x - lc.x, rc.y - lc.y);
+  const eyeDist = Math.hypot(re.x - le.x, re.y - le.y);
+  if (eyeDist < 0.001) return 0;
+  const ratio = cheekDist / eyeDist;
+
+  if (cheekBaselineCount < CHEEK_BASELINE_FRAMES) {
+    cheekBaselineSum += ratio;
+    cheekBaselineCount++;
+    cheekBaseline = cheekBaselineSum / cheekBaselineCount;
+    return 0;
+  }
+  return Math.max(0, Math.min(1, (ratio - cheekBaseline) * 10));
+}
+
 function getVideoDisplayBounds() {
   const vw = video.videoWidth;
   const vh = video.videoHeight;
@@ -111,7 +135,7 @@ async function run() {
         const pucker = puckerSmoother.process(
           (getBlend(cats, 'mouthFunnel') + getBlend(cats, 'mouthPucker')) / 2
         );
-        const cheek  = cheekSmoother.process(Math.min(1, getBlend(cats, 'cheekPuff') * 3));
+        const cheek  = cheekSmoother.process(computeCheekPuff(landmarks));
         const pan    = panSmoother.process(
           getBlend(cats, 'mouthRight') - getBlend(cats, 'mouthLeft')
         );
