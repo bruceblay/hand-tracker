@@ -111,7 +111,7 @@ async function run() {
   const audio = await createFaceFx();
   audio.start();
 
-  setHud('jaw=filter, brows=reverb, smile=distortion, pucker=vibrato, cheeks=delay, mouth L/R=pan.');
+  setHud('jaw=filter, brows=reverb, smile=distortion, pucker=vibrato, cheeks=bitcrush, mouth L/R=pan.');
   panel.hidden = false;
 
   let lastTs = -1;
@@ -144,7 +144,7 @@ async function run() {
         audio.setReverbWet(brow);
         audio.setDistortionWet(smile);
         audio.setVibratoWet(pucker);
-        audio.setDelayWet(cheek * 0.6);
+        audio.setBitCrushWet(cheek);
         audio.setPan(pan);
 
         setBar('jawOpen', jaw);

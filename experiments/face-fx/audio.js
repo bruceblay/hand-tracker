@@ -7,8 +7,8 @@ export async function createFaceFx() {
   const panner = new Tone.Panner(0).connect(limiter);
   const reverb = new Tone.Reverb({ decay: 5, wet: 0 }).connect(panner);
   await reverb.generate();
-  const delay = new Tone.FeedbackDelay({ delayTime: '8n', feedback: 0.55, wet: 0 }).connect(reverb);
-  const filter = new Tone.Filter({ type: 'lowpass', frequency: 400, Q: 1.4 }).connect(delay);
+  const bitCrusher = new Tone.BitCrusher({ bits: 4, wet: 0 }).connect(reverb);
+  const filter = new Tone.Filter({ type: 'lowpass', frequency: 400, Q: 1.4 }).connect(bitCrusher);
   const distortion = new Tone.Distortion(0.7).connect(filter);
   distortion.wet.value = 0;
   const vibrato = new Tone.Vibrato({ frequency: 5.5, depth: 0.5, wet: 0 }).connect(distortion);
@@ -40,7 +40,7 @@ export async function createFaceFx() {
     setReverbWet(w)    { reverb.wet.rampTo(w, 0.1); },
     setDistortionWet(w){ distortion.wet.rampTo(w, 0.1); },
     setVibratoWet(w)   { vibrato.wet.rampTo(w, 0.1); },
-    setDelayWet(w)     { delay.wet.rampTo(w, 0.1); },
+    setBitCrushWet(w)  { bitCrusher.wet.rampTo(w, 0.1); },
     setPan(p)          { panner.pan.rampTo(p, 0.08); }
   };
 }
