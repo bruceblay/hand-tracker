@@ -14,8 +14,9 @@ const HISTORY = 5;
 const HIGH_LOW_Y = 0.5;
 const VELOCITY_FULL_SCALE = 0.04;
 
-const left = { pinch: new PinchDetector(), yHist: [] };
-const right = { pinch: new PinchDetector(), yHist: [] };
+const PINCH_OPTS = { closeThreshold: 0.65, openThreshold: 0.8 };
+const left = { pinch: new PinchDetector(PINCH_OPTS), yHist: [] };
+const right = { pinch: new PinchDetector(PINCH_OPTS), yHist: [] };
 
 const flashes = { kick: 0, snare: 0, hihat: 0, crash: 0 };
 
