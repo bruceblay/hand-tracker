@@ -3,7 +3,8 @@ import * as Tone from 'tone';
 export async function createAudio() {
   await Tone.start();
 
-  const filter = new Tone.Filter({ type: 'lowpass', frequency: 4000, Q: 1 }).toDestination();
+  const limiter = new Tone.Limiter(-1).toDestination();
+  const filter = new Tone.Filter({ type: 'lowpass', frequency: 4000, Q: 1 }).connect(limiter);
   const synth = new Tone.Synth({
     oscillator: { type: 'triangle' },
     envelope: { attack: 0.05, decay: 0.1, sustain: 1.0, release: 0.3 }
