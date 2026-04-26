@@ -7,6 +7,17 @@ const HAND_CONNECTIONS = [
   [0,17]
 ];
 
+export function drawFace(ctx, landmarks, { width, height }) {
+  ctx.clearRect(0, 0, width, height);
+  if (!landmarks || landmarks.length === 0) return;
+  ctx.fillStyle = 'rgba(124, 204, 255, 0.55)';
+  for (const p of landmarks) {
+    ctx.beginPath();
+    ctx.arc(p.x * width, p.y * height, 1, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
 export function drawHands(ctx, hands, { width, height }) {
   ctx.clearRect(0, 0, width, height);
   ctx.lineWidth = 2;
