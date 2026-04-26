@@ -13,4 +13,5 @@
 - secret handshake password input
 - face tracking emotional response analytics
 - mask maker
+- finger number tracker
 - 

@@ -15,7 +15,7 @@ const fillEls = {
   browInner:  panel.querySelector('[data-id="browInner"] .panel-fill'),
   smile:      panel.querySelector('[data-id="smile"] .panel-fill'),
   pucker:     panel.querySelector('[data-id="pucker"] .panel-fill'),
-  cheekPuff:  panel.querySelector('[data-id="cheekPuff"] .panel-fill'),
+  eyeWide:    panel.querySelector('[data-id="eyeWide"] .panel-fill'),
   pan:        panel.querySelector('[data-id="pan"] .panel-fill'),
 };
 
@@ -23,7 +23,7 @@ const jawSmoother = new OnePole(0.3);
 const browSmoother = new OnePole(0.25);
 const smileSmoother = new OnePole(0.25);
 const puckerSmoother = new OnePole(0.25);
-const cheekSmoother = new OnePole(0.25);
+const eyeWideSmoother = new OnePole(0.25);
 const panSmoother = new OnePole(0.3);
 
 function setHud(text) { hud.textContent = text; hud.hidden = !text; }
@@ -45,30 +45,6 @@ async function startCamera() {
 
 function getBlend(categories, name) {
   return categories.find(c => c.categoryName === name)?.score ?? 0;
-}
-
-const CHEEK_BASELINE_FRAMES = 60;
-let cheekBaselineSum = 0;
-let cheekBaselineCount = 0;
-let cheekBaseline = null;
-
-function computeCheekPuff(landmarks) {
-  if (!landmarks || landmarks.length < 400) return 0;
-  const lc = landmarks[50], rc = landmarks[280];
-  const le = landmarks[33], re = landmarks[263];
-  if (!lc || !rc || !le || !re) return 0;
-  const cheekDist = Math.hypot(rc.x - lc.x, rc.y - lc.y);
-  const eyeDist = Math.hypot(re.x - le.x, re.y - le.y);
-  if (eyeDist < 0.001) return 0;
-  const ratio = cheekDist / eyeDist;
-
-  if (cheekBaselineCount < CHEEK_BASELINE_FRAMES) {
-    cheekBaselineSum += ratio;
-    cheekBaselineCount++;
-    cheekBaseline = cheekBaselineSum / cheekBaselineCount;
-    return 0;
-  }
-  return Math.max(0, Math.min(1, (ratio - cheekBaseline) * 18));
 }
 
 function getVideoDisplayBounds() {
@@ -111,7 +87,7 @@ async function run() {
   const audio = await createFaceFx();
   audio.start();
 
-  setHud('jaw=filter, brows=reverb, smile=distortion, pucker=vibrato, cheeks=bitcrush, mouth L/R=pan.');
+  setHud('jaw=filter, brows=reverb, smile=distortion, pucker=vibrato, wide eyes=bitcrush, mouth L/R=pan.');
   panel.hidden = false;
 
   let lastTs = -1;
@@ -134,7 +110,9 @@ async function run() {
         );
         const rawPucker = (getBlend(cats, 'mouthFunnel') + getBlend(cats, 'mouthPucker')) / 2;
         const pucker = puckerSmoother.process(Math.max(0, (rawPucker - 0.2) / 0.8));
-        const cheek  = cheekSmoother.process(computeCheekPuff(landmarks));
+        const eyeWide = eyeWideSmoother.process(
+          (getBlend(cats, 'eyeWideLeft') + getBlend(cats, 'eyeWideRight')) / 2
+        );
         const pan    = panSmoother.process(
           getBlend(cats, 'mouthRight') - getBlend(cats, 'mouthLeft')
         );
@@ -143,14 +121,14 @@ async function run() {
         audio.setReverbWet(brow);
         audio.setDistortionWet(smile);
         audio.setVibratoWet(pucker);
-        audio.setBitCrushWet(cheek);
+        audio.setBitCrushWet(eyeWide);
         audio.setPan(pan);
 
         setBar('jawOpen', jaw);
         setBar('browInner', brow);
         setBar('smile', smile);
         setBar('pucker', pucker);
-        setBar('cheekPuff', cheek);
+        setBar('eyeWide', eyeWide);
         setBar('pan', (pan + 1) / 2);
       }
     }
