@@ -89,17 +89,22 @@ function drawZones() {
   ctx.restore();
 }
 
+function pinchPointY(hand) {
+  return (hand[4].y + hand[8].y) / 2;
+}
+
 function handleHand(hand, side, drums) {
   if (!hand) {
     side.pinch.update(null);
     side.yHist.length = 0;
     return;
   }
-  pushY(side.yHist, hand[0].y);
+  const py = pinchPointY(hand);
+  pushY(side.yHist, py);
   const p = side.pinch.update(hand);
   if (p.justClosed) {
     const gain = velToGain(peakAbsDelta(side.yHist));
-    const high = hand[0].y < HIGH_LOW_Y;
+    const high = py < HIGH_LOW_Y;
     if (side === left) {
       if (high) { drums.hihat(gain); flashes.hihat = 1; }
       else      { drums.kick(gain);  flashes.kick = 1; }
