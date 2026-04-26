@@ -30,12 +30,35 @@
         background: #eaeaea; color: #0a0a0a; border: none; cursor: pointer;
       }
       #start[hidden] { display: none; }
+
+      #ripples {
+        position: absolute; inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .ripple {
+        position: absolute;
+        width: 16px; height: 16px;
+        border-radius: 50%;
+        border: 2px solid rgba(124, 204, 255, 0.85);
+        transform: translate(-50%, -50%);
+        backdrop-filter: blur(6px) saturate(1.15) brightness(1.05);
+        -webkit-backdrop-filter: blur(6px) saturate(1.15) brightness(1.05);
+        animation: ripple-expand 600ms ease-out forwards;
+        pointer-events: none;
+      }
+      @keyframes ripple-expand {
+        0%   { width: 16px;  height: 16px;  opacity: 1; }
+        60%  { opacity: 0.8; }
+        100% { width: 280px; height: 280px; opacity: 0; }
+      }
     </style>
   </head>
   <body>
     <div id="stage">
       <video id="video" autoplay playsinline muted></video>
       <canvas id="overlay"></canvas>
+      <div id="ripples"></div>
       <div id="hud" hidden></div>
       <a id="back" href="/">← all experiments</a>
       <button id="start">click to start</button>
