@@ -110,9 +110,8 @@ async function run() {
         );
         const rawPucker = (getBlend(cats, 'mouthFunnel') + getBlend(cats, 'mouthPucker')) / 2;
         const pucker = puckerSmoother.process(Math.max(0, (rawPucker - 0.2) / 0.8));
-        const squint = squintSmoother.process(
-          (getBlend(cats, 'eyeSquintLeft') + getBlend(cats, 'eyeSquintRight')) / 2
-        );
+        const rawSquint = (getBlend(cats, 'eyeSquintLeft') + getBlend(cats, 'eyeSquintRight')) / 2;
+        const squint = squintSmoother.process(Math.max(0, (rawSquint - 0.3) / 0.7));
         const pan    = panSmoother.process(
           getBlend(cats, 'mouthRight') - getBlend(cats, 'mouthLeft')
         );
