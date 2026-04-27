@@ -11,3 +11,5 @@
 - puzzle generator and drag/dropper pinch
 - better signature signer box
 - somthing with samples
+- globle spinner, interactive
+- 
