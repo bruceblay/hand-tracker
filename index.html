@@ -42,11 +42,16 @@
 
       main {
         position: relative; z-index: 2;
-        max-width: 720px; margin: 0 auto; padding: 64px 24px;
+        max-width: 1100px; margin: 0 auto; padding: 64px 24px;
       }
       h1 { font-weight: 600; font-size: 28px; margin: 0 0 8px; }
       p.lede { color: #999; margin: 0 0 40px; }
-      ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+      ul {
+        list-style: none; padding: 0; margin: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+      }
       a.card {
         display: block; padding: 18px 20px; border-radius: 10px;
         background: rgba(21, 21, 21, 0.85); color: inherit; text-decoration: none;
@@ -101,6 +106,30 @@
           <a class="card" href="/experiments/finger-counter/">
             <div class="title">finger counter <span class="tag">hands</span></div>
             <div class="desc">hold up some fingers. it counts. up to ten with both hands.</div>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="/experiments/tetris/">
+            <div class="title">tetris <span class="tag">hands</span></div>
+            <div class="desc">left hand picks the column and pinches to drop. right hand twists to rotate.</div>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="/experiments/tombola/">
+            <div class="title">tombola <span class="tag">hands</span></div>
+            <div class="desc">a spinning hexagon of bouncing notes. pinch to drop a ball. spin the hex with one hand. open your other hand to crack the walls.</div>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="/experiments/emoji-mirror/">
+            <div class="title">emoji mirror <span class="tag">hands · face</span></div>
+            <div class="desc">your face and hands replaced with the closest matching emoji. peace sign, thumbs up, smile, surprise, kiss.</div>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="/experiments/connect-four/">
+            <div class="title">connect four <span class="tag">hands</span></div>
+            <div class="desc">two-player. pinch to grab a token, move your hand to pick a column, release the pinch to drop.</div>
           </a>
         </li>
       </ul>

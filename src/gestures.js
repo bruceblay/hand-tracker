@@ -64,6 +64,7 @@ export class PinchMotionDetector {
 export class PinchDetector {
   constructor({ closeThreshold = 0.45, openThreshold = 0.7, minInterval = 0 } = {}) {
     this.closed = false;
+    this.armed = false;
     this.closeThreshold = closeThreshold;
     this.openThreshold = openThreshold;
     this.minInterval = minInterval;
@@ -74,6 +75,7 @@ export class PinchDetector {
     if (!landmarks) {
       const justOpened = this.closed;
       this.closed = false;
+      this.armed = false;
       return { state: 'idle', ratio: null, justClosed: false, justOpened };
     }
     const palm = distance(landmarks[0], landmarks[9]) || 1e-6;
@@ -81,6 +83,12 @@ export class PinchDetector {
     const ratio = pinch / palm;
 
     let justClosed = false, justOpened = false;
+
+    if (!this.armed) {
+      if (ratio > this.openThreshold) this.armed = true;
+      return { state: this.closed ? 'closed' : 'open', ratio, justClosed, justOpened };
+    }
+
     if (!this.closed && ratio < this.closeThreshold) {
       this.closed = true;
       const now = performance.now();

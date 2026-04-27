@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tetris · hand-tracker</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; height: 100%; background: #0a0a0a; color: #eaeaea; font-family: ui-sans-serif, system-ui, sans-serif; overflow: hidden; }
+      #stage { position: relative; width: 100vw; height: 100vh; }
+      #video, #overlay {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover;
+      }
+      #video { transform: scaleX(-1); filter: brightness(0.3) saturate(0.55); }
+      #board {
+        position: absolute;
+        left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 4px;
+        box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
+      }
+      #hud {
+        position: absolute; right: 24px; top: 56px;
+        background: rgba(0, 0, 0, 0.55);
+        padding: 14px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+      #hud[hidden] { display: none; }
+      .hud-label { color: #888; margin-right: 10px; }
+      .hud-value { color: #eaeaea; font-variant-numeric: tabular-nums; font-weight: 600; }
+      #next-canvas { display: block; margin-top: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; }
+      #legend {
+        position: absolute; left: 24px; top: 56px;
+        background: rgba(0, 0, 0, 0.55);
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.6;
+        color: #ccc;
+        max-width: 220px;
+      }
+      #legend[hidden] { display: none; }
+      #debug {
+        position: absolute; right: 24px; bottom: 24px;
+        background: rgba(0,0,0,0.55);
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-family: ui-monospace, SFMono-Regular, monospace;
+        font-size: 11px;
+        line-height: 1.6;
+        color: #ccc;
+      }
+      #debug[hidden] { display: none; }
+      .dbg-key { color: #888; margin-right: 8px; }
+
+      #tune-toggle, #mute-toggle {
+        position: absolute;
+        background: rgba(0,0,0,0.55); color: #ccc;
+        border: 1px solid rgba(255,255,255,0.15);
+        padding: 6px 10px; border-radius: 6px;
+        font-size: 11px; cursor: pointer;
+        z-index: 11;
+      }
+      #mute-toggle { left: 12px; top: 12px; }
+      #tune-toggle { left: 12px; bottom: 12px; }
+      #ios-silent-hint {
+        position: absolute;
+        left: 12px; top: 40px;
+        font-size: 10px;
+        color: #888;
+        max-width: 130px;
+        line-height: 1.3;
+        pointer-events: none;
+      }
+      #ios-silent-hint[hidden] { display: none; }
+      #tune-panel {
+        position: absolute; left: 12px; bottom: 56px;
+        background: rgba(0,0,0,0.78); color: #eaeaea;
+        padding: 14px 16px; border-radius: 8px;
+        font-size: 12px;
+        width: 340px;
+        z-index: 10;
+      }
+      #tune-panel[hidden] { display: none; }
+      #tune-panel h3 { margin: 0 0 10px; font-size: 12px; font-weight: 600; color: #ccc; letter-spacing: 0.04em; text-transform: uppercase; }
+      #tune-panel label { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+      #tune-panel .lbl { width: 110px; color: #999; }
+      #tune-panel input[type="range"] { flex: 1; }
+      #tune-panel .val { width: 56px; text-align: right; font-family: ui-monospace, SFMono-Regular, monospace; color: #eaeaea; font-size: 11px; }
+      #tune-panel .hint { margin-top: 6px; color: #666; font-size: 10px; }
+      #gameover {
+        position: absolute; left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        padding: 32px 40px;
+        border-radius: 12px;
+        text-align: center;
+        z-index: 5;
+        min-width: 240px;
+      }
+      #gameover[hidden] { display: none; }
+      #gameover h1 { margin: 0 0 8px; font-size: 28px; font-weight: 600; }
+      #gameover .final { font-size: 14px; color: #aaa; margin-bottom: 16px; }
+      #gameover button {
+        margin-top: 4px;
+        padding: 10px 18px;
+        font-size: 14px;
+        border-radius: 8px;
+        background: #eaeaea;
+        color: #0a0a0a;
+        border: none;
+        cursor: pointer;
+      }
+      #back {
+        position: absolute; right: 12px; top: 12px;
+        font-size: 12px; color: #eaeaea; text-decoration: none;
+        background: rgba(0, 0, 0, 0.45); padding: 8px 10px; border-radius: 6px;
+      }
+      #start {
+        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        padding: 14px 22px; font-size: 16px; border-radius: 8px;
+        background: #eaeaea; color: #0a0a0a; border: none; cursor: pointer;
+      }
+      #start[hidden] { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+      <canvas id="board" width="300" height="600"></canvas>
+      <div id="hud" hidden>
+        <div><span class="hud-label">score</span><span class="hud-value" id="score">0</span></div>
+        <div><span class="hud-label">next</span></div>
+        <canvas id="next-canvas" width="120" height="120"></canvas>
+      </div>
+      <div id="legend" hidden>
+        <div><b>left hand</b>: column · pinch to drop</div>
+        <div><b>right hand</b>: pinch + twist to rotate</div>
+      </div>
+      <div id="debug" hidden>
+        <div><span class="dbg-key">velocity</span><span id="dbg-neutral">—</span></div>
+        <div><span class="dbg-key">pinch</span><span id="dbg-angle">—</span></div>
+        <div><span class="dbg-key">state</span><span id="dbg-state">—</span></div>
+        <div><span class="dbg-key">last</span><span id="dbg-last">—</span></div>
+        <span id="dbg-delta" hidden></span>
+      </div>
+      <div id="gameover" hidden>
+        <h1>game over</h1>
+        <div class="final">score <span class="hud-value" id="final-score">0</span></div>
+        <button id="restart">play again</button>
+      </div>
+      <a id="back" href="/">← all experiments</a>
+      <button id="start">click to start</button>
+      <button id="mute-toggle">sound on</button>
+      <div id="ios-silent-hint" hidden>iOS: silent mode mutes web audio</div>
+      <button id="tune-toggle">tune</button>
+      <div id="tune-panel" hidden>
+        <h3>tune</h3>
+        <label><span class="lbl">CW velocity</span><input type="range" id="t-cw"><span class="val" id="t-cw-val"></span></label>
+        <label><span class="lbl">CCW velocity</span><input type="range" id="t-ccw"><span class="val" id="t-ccw-val"></span></label>
+        <label><span class="lbl">smoothing</span><input type="range" id="t-smooth"><span class="val" id="t-smooth-val"></span></label>
+        <label><span class="lbl">pinch close</span><input type="range" id="t-pclose"><span class="val" id="t-pclose-val"></span></label>
+        <label><span class="lbl">pinch open</span><input type="range" id="t-popen"><span class="val" id="t-popen-val"></span></label>
+        <label><span class="lbl">pinch min drop</span><input type="range" id="t-pinch"><span class="val" id="t-pinch-val"></span></label>
+        <div class="hint">press <b>T</b> or click "tune" to hide</div>
+      </div>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

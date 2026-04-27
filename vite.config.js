@@ -13,7 +13,11 @@ export default defineConfig({
         theremin: resolve(here, 'experiments/theremin/index.html'),
         airDrums: resolve(here, 'experiments/air-drums/index.html'),
         faceFx: resolve(here, 'experiments/face-fx/index.html'),
-        fingerCounter: resolve(here, 'experiments/finger-counter/index.html')
+        fingerCounter: resolve(here, 'experiments/finger-counter/index.html'),
+        tetris: resolve(here, 'experiments/tetris/index.html'),
+        tombola: resolve(here, 'experiments/tombola/index.html'),
+        emojiMirror: resolve(here, 'experiments/emoji-mirror/index.html'),
+        connectFour: resolve(here, 'experiments/connect-four/index.html')
       }
     }
   }

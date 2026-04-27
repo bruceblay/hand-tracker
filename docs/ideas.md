@@ -3,13 +3,12 @@
 - paint/draw
 - grapher based on hand motions.  live draw the chart
 - knob twister
-- big kaoss pad
-- emoji overlays that match hand shapes or face
+- big kaoss pad or double kaoss pad since we have two hands
 - two turntable and crossfader mixer ui
-- tetris
 - snake
 - pong
 - juggling game
+- connect four
 - hi five simulator
 - secret handshake password input
 - face tracking emotional response analytics

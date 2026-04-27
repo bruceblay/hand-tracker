@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>connect four · hand-tracker</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; height: 100%; background: #0a0a0a; color: #eaeaea; font-family: ui-sans-serif, system-ui, sans-serif; overflow: hidden; }
+      #stage { position: relative; width: 100vw; height: 100vh; }
+      #video, #overlay {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover;
+      }
+      #video { transform: scaleX(-1); filter: brightness(0.3) saturate(0.55); }
+      #board {
+        position: absolute;
+        left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      #turn {
+        position: absolute; left: 50%; top: 24px;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.55);
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        line-height: 1.4;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #turn[hidden] { display: none; }
+      .turn-dot {
+        width: 16px; height: 16px; border-radius: 50%;
+        display: inline-block;
+      }
+      .turn-dot.red { background: #e53935; }
+      .turn-dot.black { background: #0d47a1; border: 1px solid #082671; }
+      #legend {
+        position: absolute; left: 24px; top: 56px;
+        background: rgba(0, 0, 0, 0.55);
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.6;
+        color: #ccc;
+        max-width: 240px;
+      }
+      #legend[hidden] { display: none; }
+      #result {
+        position: absolute; left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        padding: 32px 40px;
+        border-radius: 12px;
+        text-align: center;
+        z-index: 5;
+        min-width: 240px;
+      }
+      #result[hidden] { display: none; }
+      #result h1 { margin: 0 0 16px; font-size: 28px; font-weight: 600; }
+      #result button {
+        padding: 10px 18px; font-size: 14px; border-radius: 8px;
+        background: #eaeaea; color: #0a0a0a; border: none; cursor: pointer;
+      }
+      #back {
+        position: absolute; right: 12px; top: 12px;
+        font-size: 12px; color: #eaeaea; text-decoration: none;
+        background: rgba(0, 0, 0, 0.45); padding: 8px 10px; border-radius: 6px;
+      }
+      #start {
+        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        padding: 14px 22px; font-size: 16px; border-radius: 8px;
+        background: #eaeaea; color: #0a0a0a; border: none; cursor: pointer;
+      }
+      #start[hidden] { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+      <canvas id="board" width="420" height="420"></canvas>
+      <div id="turn" hidden>
+        <span class="turn-dot" id="turn-dot"></span>
+        <span id="turn-text">red's turn</span>
+      </div>
+      <div id="legend" hidden>
+        <div>pinch to grab a token</div>
+        <div>move your hand left/right to choose a column</div>
+        <div>release the pinch to drop it in</div>
+      </div>
+      <div id="result" hidden>
+        <h1 id="result-text">red wins</h1>
+        <button id="restart">play again</button>
+      </div>
+      <a id="back" href="/">← all experiments</a>
+      <button id="start">click to start</button>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
