@@ -20,6 +20,25 @@
         background: rgba(0,0,0,0.45); padding: 8px 10px; border-radius: 6px;
         pointer-events: none;
       }
+      #controls {
+        position: absolute; right: 12px; top: 50px;
+        background: rgba(0,0,0,0.55);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        padding: 8px 12px; border-radius: 8px;
+        font-size: 12px; color: #ccc;
+        display: flex; align-items: center; gap: 10px;
+      }
+      #controls[hidden] { display: none; }
+      #controls .label { color: #888; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+      #controls select {
+        background: #151515; color: #eaeaea;
+        border: 1px solid #333;
+        padding: 4px 8px; border-radius: 4px;
+        font-family: inherit; font-size: 12px;
+        cursor: pointer;
+      }
+      #controls select:focus { outline: none; border-color: #7cf; }
       #back {
         position: absolute; right: 12px; top: 12px;
         font-size: 12px; color: #eaeaea; text-decoration: none;
@@ -37,7 +56,22 @@
     <div id="stage">
       <video id="video" autoplay playsinline muted></video>
       <canvas id="overlay"></canvas>
-      <div id="hud">loading…</div>
+      <div id="hud" hidden></div>
+      <div id="controls" hidden>
+        <span class="label">preset</span>
+        <select id="preset-select">
+          <option value="classic">classic theremin</option>
+          <option value="smooth">smooth pad</option>
+          <option value="lead">saw lead</option>
+          <option value="fatSaw">fat saw</option>
+          <option value="buzz">square buzz</option>
+          <option value="pulse">narrow pulse</option>
+          <option value="wobble">wobble</option>
+          <option value="amRing">am ring</option>
+          <option value="glass">glass</option>
+          <option value="fm">fm bell</option>
+        </select>
+      </div>
       <a id="back" href="/">← all experiments</a>
       <button id="start">click to start</button>
     </div>

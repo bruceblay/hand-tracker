@@ -15,7 +15,7 @@ const volSmoother = new OnePole(0.25);
 const filterSmoother = new OnePole(0.2, 4000);
 const resonanceSmoother = new OnePole(0.2, 1);
 
-function setHud(text) { hud.textContent = text; }
+function setHud(text) { hud.textContent = text; hud.hidden = !text; }
 
 function resizeCanvas() {
   canvas.width = canvas.clientWidth;
@@ -53,7 +53,14 @@ async function run() {
   const audio = await createAudio();
 
   setHud('left side: y = pitch, x = resonance. right side: y = volume, x = filter cutoff.');
-  audio.setVolume01(0.7);
+  audio.setVolume01(0.4);
+
+  const controls = document.getElementById('controls');
+  const presetSelect = document.getElementById('preset-select');
+  controls.hidden = false;
+  presetSelect.addEventListener('change', () => {
+    audio.setPreset(presetSelect.value);
+  });
 
   let lastTs = -1;
   const loop = () => {
@@ -100,5 +107,3 @@ startBtn.addEventListener('click', () => {
     startBtn.hidden = false;
   });
 });
-
-setHud('click to start');

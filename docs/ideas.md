@@ -10,4 +10,4 @@
 - simple sign language interpreter
 - puzzle generator and drag/dropper pinch
 - better signature signer box
-- pdf annotator
+- somthing with samples
