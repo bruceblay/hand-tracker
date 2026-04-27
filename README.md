@@ -34,7 +34,7 @@ the browser's autoplay gesture rule.
 ## Stack
 
 - **[Vite](https://vitejs.dev)** — dev server and bundler. Multi-page setup; each experiment is its own entry in `vite.config.js`.
-- **[MediaPipe Tasks Vision](https://ai.google.dev/edge/mediapipe/solutions/vision)** — `HandLandmarker`, `FaceLandmarker` (with blendshapes), `GestureRecognizer`. WASM + GPU.
+- **[MediaPipe Tasks Vision](https://www.npmjs.com/package/@mediapipe/tasks-vision)** — `HandLandmarker`, `FaceLandmarker` (with blendshapes), `GestureRecognizer`. WASM + GPU. See the [MediaPipe Solutions guide](https://ai.google.dev/edge/mediapipe/solutions/guide) for an overview of available tasks.
 - **[Tone.js](https://tonejs.github.io)** — Web Audio synthesis for music experiments.
 - **[Three.js](https://threejs.org)** — for the 3D shapes experiment.
 - **[PDF.js](https://mozilla.github.io/pdf.js/)** — for the PDF annotator.
