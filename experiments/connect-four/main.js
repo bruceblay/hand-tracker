@@ -1,3 +1,4 @@
+import '../../src/nav.js';
 import { createHandTracker } from '../../src/tracking.js';
 import { drawHands } from '../../src/draw.js';
 import { mirrorX, OnePole } from '../../src/mappings.js';
@@ -237,14 +238,21 @@ async function run() {
   loop();
 }
 
-startBtn.addEventListener('click', () => {
+let started = false;
+function autoStart() {
+  if (started) return;
+  started = true;
   run().catch(err => {
     console.error(err);
     startBtn.hidden = false;
     turnEl.hidden = true;
     legend.hidden = true;
+    started = false;
   });
-});
+}
+
+startBtn.addEventListener('click', autoStart);
+autoStart();
 
 restartBtn.addEventListener('click', () => {
   game = createGame();

@@ -1,3 +1,4 @@
+import '../../src/nav.js';
 import { createFaceTracker } from '../../src/tracking.js';
 import { drawFace } from '../../src/draw.js';
 import { OnePole, mirrorX } from '../../src/mappings.js';

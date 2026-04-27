@@ -1,3 +1,4 @@
+import '../../src/nav.js';
 import { createHandTracker } from '../../src/tracking.js';
 import { drawHands } from '../../src/draw.js';
 import { mirrorX } from '../../src/mappings.js';
@@ -102,10 +103,17 @@ async function run() {
   loop();
 }
 
-startBtn.addEventListener('click', () => {
+let started = false;
+function autoStart() {
+  if (started) return;
+  started = true;
   run().catch(err => {
     console.error(err);
     startBtn.hidden = false;
     counter.hidden = true;
+    started = false;
   });
-});
+}
+
+startBtn.addEventListener('click', autoStart);
+autoStart();

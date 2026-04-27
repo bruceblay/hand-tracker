@@ -1,18 +1,13 @@
 - ochestra conductor
-- watery liquid effect that follows hand movements - trippy
-- paint/draw
 - grapher based on hand motions.  live draw the chart
 - knob twister
 - big kaoss pad or double kaoss pad since we have two hands
 - two turntable and crossfader mixer ui
 - snake
 - pong
-- juggling game
-- connect four
-- hi five simulator
-- secret handshake password input
 - face tracking emotional response analytics
 - mask maker
-- face drums
-- 3d shape manipulator (three.js)
 - simple sign language interpreter
+- puzzle generator and drag/dropper pinch
+- better signature signer box
+- pdf annotator

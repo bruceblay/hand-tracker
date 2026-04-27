@@ -1,3 +1,4 @@
+import '../../src/nav.js';
 import { createHandTracker } from '../../src/tracking.js';
 import { drawHands } from '../../src/draw.js';
 import { mirrorX, OnePole } from '../../src/mappings.js';

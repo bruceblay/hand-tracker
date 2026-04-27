@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>face drums · hand-tracker</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; height: 100%; background: #0a0a0a; color: #eaeaea; font-family: ui-sans-serif, system-ui, sans-serif; overflow: hidden; }
+      #stage { position: relative; width: 100vw; height: 100vh; }
+      #video, #overlay {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover;
+      }
+      #video { transform: scaleX(-1); }
+
+      #panel {
+        position: absolute;
+        right: 20px; top: 50%;
+        transform: translateY(-50%);
+        display: flex; flex-direction: column; gap: 10px;
+        pointer-events: none;
+        font-family: ui-monospace, SFMono-Regular, monospace;
+        font-size: 11px;
+        color: #eaeaea;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 16px 18px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      #panel[hidden] { display: none; }
+      .panel-row {
+        display: flex; align-items: center; gap: 10px;
+        padding: 4px 6px;
+        border-radius: 6px;
+        transition: background 80ms;
+      }
+      .panel-row.flash { background: rgba(124, 204, 255, 0.35); }
+      .panel-label { width: 60px; opacity: 0.85; text-transform: lowercase; }
+      .panel-trigger { font-size: 18px; width: 22px; text-align: center; }
+      .panel-bar { width: 110px; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; position: relative; }
+      .panel-fill { height: 100%; background: rgba(124, 204, 255, 0.85); width: 0%; transition: width 50ms linear; }
+      .panel-thresh {
+        position: absolute; top: 0; bottom: 0; width: 1px;
+        background: rgba(255, 255, 255, 0.4);
+      }
+
+      #hud {
+        position: absolute; left: 12px; top: 12px;
+        font-size: 12px; line-height: 1.4;
+        background: rgba(0,0,0,0.45); padding: 8px 10px; border-radius: 6px;
+        pointer-events: none;
+      }
+      #hud[hidden] { display: none; }
+      #back {
+        position: absolute; right: 12px; top: 12px;
+        font-size: 12px; color: #eaeaea; text-decoration: none;
+        background: rgba(0,0,0,0.45); padding: 8px 10px; border-radius: 6px;
+      }
+      #start {
+        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        padding: 14px 22px; font-size: 16px; border-radius: 8px;
+        background: #eaeaea; color: #0a0a0a; border: none; cursor: pointer;
+      }
+      #start[hidden] { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+      <div id="hud" hidden></div>
+      <div id="panel" hidden>
+        <div class="panel-row" data-id="kick">
+          <span class="panel-trigger">😮</span><span class="panel-label">kick</span>
+          <div class="panel-bar"><div class="panel-fill"></div><div class="panel-thresh"></div></div>
+        </div>
+        <div class="panel-row" data-id="snare">
+          <span class="panel-trigger">😀</span><span class="panel-label">snare</span>
+          <div class="panel-bar"><div class="panel-fill"></div><div class="panel-thresh"></div></div>
+        </div>
+        <div class="panel-row" data-id="hihat">
+          <span class="panel-trigger">🤨</span><span class="panel-label">hi-hat</span>
+          <div class="panel-bar"><div class="panel-fill"></div><div class="panel-thresh"></div></div>
+        </div>
+        <div class="panel-row" data-id="tom">
+          <span class="panel-trigger">😘</span><span class="panel-label">tom</span>
+          <div class="panel-bar"><div class="panel-fill"></div><div class="panel-thresh"></div></div>
+        </div>
+        <div class="panel-row" data-id="crash">
+          <span class="panel-trigger">😉</span><span class="panel-label">crash</span>
+          <div class="panel-bar"><div class="panel-fill"></div><div class="panel-thresh"></div></div>
+        </div>
+        <div class="panel-row" data-id="ride">
+          <span class="panel-trigger">😜</span><span class="panel-label">ride</span>
+          <div class="panel-bar"><div class="panel-fill"></div><div class="panel-thresh"></div></div>
+        </div>
+      </div>
+      <a id="back" href="/">← all experiments</a>
+      <button id="start">click to start</button>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

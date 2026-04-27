@@ -1,3 +1,4 @@
+import '../../src/nav.js';
 import { createGestureRecognizer, createFaceTracker } from '../../src/tracking.js';
 import { mirrorX } from '../../src/mappings.js';
 
@@ -278,10 +279,18 @@ async function run() {
   loop();
 }
 
-startBtn.addEventListener('click', () => {
+let started = false;
+function autoStart() {
+  if (started) return;
+  started = true;
   run().catch(err => {
     console.error(err);
     status.textContent = `error: ${err.message}`;
+    status.hidden = false;
     startBtn.hidden = false;
+    started = false;
   });
-});
+}
+
+startBtn.addEventListener('click', autoStart);
+autoStart();

@@ -17,7 +17,13 @@ export default defineConfig({
         tetris: resolve(here, 'experiments/tetris/index.html'),
         tombola: resolve(here, 'experiments/tombola/index.html'),
         emojiMirror: resolve(here, 'experiments/emoji-mirror/index.html'),
-        connectFour: resolve(here, 'experiments/connect-four/index.html')
+        connectFour: resolve(here, 'experiments/connect-four/index.html'),
+        secretHandshake: resolve(here, 'experiments/secret-handshake/index.html'),
+        faceDrums: resolve(here, 'experiments/face-drums/index.html'),
+        threeDShapes: resolve(here, 'experiments/3d-shapes/index.html'),
+        pondSurface: resolve(here, 'experiments/pond-surface/index.html'),
+        paint: resolve(here, 'experiments/paint/index.html'),
+        pdfAnnotator: resolve(here, 'experiments/pdf-annotator/index.html')
       }
     }
   }

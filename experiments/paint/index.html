@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>paint · hand-tracker</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; height: 100%; background: #0a0a0a; color: #eaeaea; font-family: ui-sans-serif, system-ui, sans-serif; overflow: hidden; }
+      #stage { position: relative; width: 100vw; height: 100vh; }
+      #video, #draw, #overlay {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+      }
+      #video {
+        object-fit: cover;
+        transform: scaleX(-1);
+        filter: brightness(0.35) saturate(0.6);
+      }
+
+      #toolbar {
+        position: absolute; left: 50%; top: 16px;
+        transform: translateX(-50%);
+        display: flex; gap: 6px;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 6px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      #toolbar[hidden] { display: none; }
+      #toolbar button {
+        background: transparent; color: #ccc;
+        border: 1px solid transparent;
+        padding: 8px 14px; border-radius: 6px;
+        font-size: 12px; cursor: pointer;
+        font-family: inherit;
+      }
+      #toolbar button.active {
+        background: rgba(124, 204, 255, 0.2);
+        border-color: rgba(124, 204, 255, 0.35);
+        color: #eaeaea;
+      }
+      #toolbar button:hover { color: #eaeaea; }
+      #toolbar .sep { width: 1px; background: rgba(255, 255, 255, 0.08); margin: 4px 2px; }
+
+      #legend {
+        position: absolute; left: 24px; top: 24px;
+        background: rgba(0, 0, 0, 0.55);
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.65;
+        color: #ccc;
+        max-width: 280px;
+      }
+      #legend[hidden] { display: none; }
+      #legend b { color: #eaeaea; }
+      #legend .heading { color: #888; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 8px; }
+      #legend .heading:first-child { margin-top: 0; }
+
+      #status {
+        position: absolute; left: 50%; bottom: 24px;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 8px 16px; border-radius: 8px;
+        font-size: 13px;
+        display: flex; align-items: center; gap: 10px;
+      }
+      #status[hidden] { display: none; }
+      #status .label { color: #888; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+      #status .emoji { font-size: 24px; line-height: 1; }
+      #status .src { color: #777; font-size: 11px; font-style: italic; }
+      #status .color-dot {
+        width: 22px; height: 22px; border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.25);
+        display: inline-block;
+      }
+      #status .thickness-bar {
+        width: 80px; height: 6px; background: rgba(255,255,255,0.1);
+        border-radius: 3px; overflow: hidden;
+      }
+      #status .thickness-fill {
+        height: 100%; background: rgba(255,255,255,0.85);
+        width: 30%;
+      }
+      #emoji-info, #line-info, #erase-info { display: flex; align-items: center; gap: 10px; }
+      #emoji-info[hidden], #line-info[hidden], #erase-info[hidden] { display: none; }
+
+      #back {
+        position: absolute; right: 12px; top: 12px;
+        font-size: 12px; color: #eaeaea; text-decoration: none;
+        background: rgba(0, 0, 0, 0.45); padding: 8px 10px; border-radius: 6px;
+      }
+      #boot {
+        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        font-size: 13px; color: #888;
+      }
+      #boot[hidden] { display: none; }
+
+      #tune-toggle {
+        position: absolute; right: 24px; bottom: 24px;
+        background: rgba(0, 0, 0, 0.55);
+        color: #ccc; border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 8px 12px; border-radius: 6px;
+        font-size: 11px; cursor: pointer; z-index: 11;
+        font-family: inherit;
+      }
+      #tune-toggle:hover { color: #eaeaea; }
+      #tune-toggle.active { background: rgba(124, 204, 255, 0.18); border-color: rgba(124, 204, 255, 0.35); color: #eaeaea; }
+      #tune-toggle[hidden] { display: none; }
+      #tune {
+        position: absolute; right: 24px; bottom: 64px;
+        background: rgba(0, 0, 0, 0.78);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 14px 16px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 11px;
+        color: #ccc;
+        width: 320px;
+        z-index: 10;
+      }
+      #tune[hidden] { display: none; }
+      #tune .row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+      #tune .row:last-child { margin-bottom: 0; }
+      #tune label { width: 130px; opacity: 0.85; }
+      #tune input[type="range"] { flex: 1; }
+      #tune .val { width: 38px; text-align: right; font-family: ui-monospace, SFMono-Regular, monospace; }
+      #tune .heading { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="draw"></canvas>
+      <canvas id="overlay"></canvas>
+      <div id="toolbar" hidden>
+        <button data-mode="line" class="active">line</button>
+        <button data-mode="emoji">emoji</button>
+        <button data-mode="erase">erase</button>
+        <span class="sep"></span>
+        <button id="undo-btn">undo</button>
+        <button id="clear-btn">clear</button>
+        <span class="sep"></span>
+        <button id="reverse-btn">reverse hands</button>
+      </div>
+      <div id="legend" hidden>
+        <div class="heading">drawing hand</div>
+        <div id="legend-action">pinch + drag to <b>draw</b></div>
+        <div id="legend-line">
+          <div class="heading">other hand</div>
+          <div>y position = <b>thickness</b></div>
+          <div>pinch = <b>cycle color</b></div>
+        </div>
+        <div id="legend-emoji" hidden>
+          <div class="heading">other hand</div>
+          <div>hand shape = <b>stamp emoji</b></div>
+          <div>y position = <b>emoji size</b></div>
+          <div class="heading">face</div>
+          <div>expression = <b>emoji fallback</b></div>
+        </div>
+        <div id="legend-erase" hidden>
+          <div class="heading">other hand</div>
+          <div>y position = <b>brush size</b></div>
+        </div>
+      </div>
+      <div id="status" hidden>
+        <span id="emoji-info">
+          <span class="label">stamp</span>
+          <span class="emoji" id="current-emoji">🌟</span>
+          <span class="src" id="emoji-src">default</span>
+        </span>
+        <span id="line-info" hidden>
+          <span class="label">color</span>
+          <span class="color-dot" id="color-dot" style="background:#ffffff"></span>
+          <span class="label" style="margin-left:8px">size</span>
+          <span class="thickness-bar"><span class="thickness-fill" id="thickness-fill"></span></span>
+        </span>
+        <span id="erase-info" hidden>
+          <span class="label">eraser size</span>
+          <span class="thickness-bar"><span class="thickness-fill" id="erase-fill"></span></span>
+        </span>
+      </div>
+      <a id="back" href="/">← all experiments</a>
+      <div id="boot">starting…</div>
+      <button id="tune-toggle" hidden>tune</button>
+      <div id="tune" hidden>
+        <div class="heading">tune</div>
+        <div class="row">
+          <label>line/erase pinch</label>
+          <input type="range" id="t-line-pinch" min="0.1" max="0.6" step="0.02">
+          <span class="val" id="t-line-pinch-val"></span>
+        </div>
+        <div class="row">
+          <label>emoji pinch</label>
+          <input type="range" id="t-emoji-pinch" min="0.1" max="0.6" step="0.02">
+          <span class="val" id="t-emoji-pinch-val"></span>
+        </div>
+        <div class="row">
+          <label>line smoothing</label>
+          <input type="range" id="t-smooth" min="0.05" max="0.9" step="0.05">
+          <span class="val" id="t-smooth-val"></span>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

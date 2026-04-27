@@ -1,3 +1,4 @@
+import '../../src/nav.js';
 import { createHandTracker } from '../../src/tracking.js';
 import { createAudio } from './audio.js';
 import { drawHands } from '../../src/draw.js';

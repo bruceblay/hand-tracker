@@ -96,11 +96,23 @@ async function enable() {
   loop();
 }
 
-enableBtn.addEventListener('click', () => {
+const STORAGE_KEY = 'handControlEnabled';
+
+function startEnable() {
   enable().catch(err => {
     console.error(err);
     enableBtn.hidden = false;
     enableBtn.textContent = `error: ${err.message}`;
     document.body.classList.remove('hand-mode');
+    localStorage.removeItem(STORAGE_KEY);
   });
+}
+
+enableBtn.addEventListener('click', () => {
+  localStorage.setItem(STORAGE_KEY, 'true');
+  startEnable();
 });
+
+if (localStorage.getItem(STORAGE_KEY) === 'true') {
+  startEnable();
+}

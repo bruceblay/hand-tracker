@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>secret handshake · hand-tracker</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; height: 100%; background: #0a0a0a; color: #eaeaea; font-family: ui-sans-serif, system-ui, sans-serif; overflow: hidden; }
+      #stage { position: relative; width: 100vw; height: 100vh; }
+      #video, #overlay {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover;
+      }
+      #video { transform: scaleX(-1); filter: brightness(0.45); }
+
+      #status {
+        position: absolute; left: 50%; top: 24px;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.6);
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        text-align: center;
+        max-width: 80vw;
+      }
+      #status[hidden] { display: none; }
+
+      #sequence-panel {
+        position: absolute; left: 50%; bottom: 100px;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.65);
+        padding: 16px 22px;
+        border-radius: 12px;
+        text-align: center;
+        min-width: 240px;
+      }
+      #sequence-panel[hidden] { display: none; }
+      .seq-label { font-size: 11px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+      .seq-row { display: flex; gap: 10px; justify-content: center; align-items: center; min-height: 56px; }
+      .seq-cell {
+        font-size: 40px;
+        line-height: 1;
+        width: 50px; height: 50px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .seq-cell.filled { background: rgba(124, 204, 255, 0.18); }
+      .seq-cell.placeholder { color: #444; font-size: 24px; }
+      .seq-cell.flash { animation: flash 280ms ease-out; }
+      @keyframes flash {
+        0% { background: rgba(124, 204, 255, 0.7); transform: scale(1.15); }
+        100% { background: rgba(124, 204, 255, 0.18); transform: scale(1); }
+      }
+
+      #actions {
+        position: absolute; left: 50%; bottom: 24px;
+        transform: translateX(-50%);
+        display: flex; gap: 10px;
+      }
+      #actions[hidden] { display: none; }
+      #actions button {
+        background: #151515; color: #eaeaea;
+        border: 1px solid #333;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      #actions button:hover { border-color: #7cf; }
+      #actions button:disabled { opacity: 0.4; cursor: default; }
+
+      #result {
+        position: absolute; left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(12px) saturate(1.1);
+        -webkit-backdrop-filter: blur(12px) saturate(1.1);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 36px 48px;
+        border-radius: 14px;
+        text-align: center;
+        z-index: 5;
+        min-width: 280px;
+      }
+      #result[hidden] { display: none; }
+      #result h1 { margin: 0 0 18px; font-size: 28px; font-weight: 600; }
+      #result.success h1 { color: #7cdf7c; }
+      #result.failed h1 { color: #ef5350; }
+      #result button {
+        padding: 10px 18px; font-size: 14px; border-radius: 8px;
+        background: #eaeaea; color: #0a0a0a; border: none; cursor: pointer;
+      }
+
+      #back {
+        position: absolute; right: 12px; top: 12px;
+        font-size: 12px; color: #eaeaea; text-decoration: none;
+        background: rgba(0, 0, 0, 0.45); padding: 8px 10px; border-radius: 6px;
+      }
+      #start {
+        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        padding: 14px 22px; font-size: 16px; border-radius: 8px;
+        background: #eaeaea; color: #0a0a0a; border: none; cursor: pointer;
+      }
+      #start[hidden] { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+
+      <div id="status" hidden>setup</div>
+
+      <div id="sequence-panel" hidden>
+        <div class="seq-label" id="seq-label">your handshake</div>
+        <div class="seq-row" id="seq-row"></div>
+      </div>
+
+      <div id="actions" hidden>
+        <button id="save-btn" disabled>save handshake</button>
+        <button id="reset-btn">reset</button>
+      </div>
+
+      <div id="result" hidden>
+        <h1 id="result-text"></h1>
+        <button id="try-again-btn">try again</button>
+      </div>
+
+      <a id="back" href="/">← all experiments</a>
+      <button id="start">click to start</button>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
