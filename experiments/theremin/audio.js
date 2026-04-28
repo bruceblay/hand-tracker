@@ -37,7 +37,10 @@ export async function createAudio() {
   await Tone.start();
 
   const limiter = new Tone.Limiter(-1).toDestination();
-  const filter = new Tone.Filter({ type: 'lowpass', frequency: 4000, Q: 1 }).connect(limiter);
+  const reverb = new Tone.Reverb({ decay: 3, wet: 0 }).connect(limiter);
+  await reverb.generate();
+  const delay = new Tone.FeedbackDelay({ delayTime: 0.25, feedback: 0.35, wet: 0 }).connect(reverb);
+  const filter = new Tone.Filter({ type: 'lowpass', frequency: 4000, Q: 1 }).connect(delay);
   const presetGain = new Tone.Gain(PRESETS.classic.gain).connect(filter);
   const synth = new Tone.Synth({
     oscillator: PRESETS.classic.oscillator,
@@ -62,7 +65,7 @@ export async function createAudio() {
       synth.frequency.rampTo(hz, 0.03);
     },
     setVolume01(v) {
-      const VOLUME_CAP = 0.3;
+      const VOLUME_CAP = 0.45;
       const scaled = v * VOLUME_CAP;
       const db = scaled <= 0.001 ? -60 : 20 * Math.log10(scaled);
       synth.volume.rampTo(db, 0.05);
@@ -78,6 +81,21 @@ export async function createAudio() {
       if (!p) return;
       synth.set({ oscillator: p.oscillator, envelope: p.envelope });
       presetGain.gain.rampTo(p.gain ?? 1, 0.05);
+    },
+    setReverbWet(w) {
+      reverb.wet.rampTo(w, 0.05);
+    },
+    setReverbDecay(seconds) {
+      reverb.decay = seconds;
+    },
+    setDelayWet(w) {
+      delay.wet.rampTo(w, 0.05);
+    },
+    setDelayTime(seconds) {
+      delay.delayTime.rampTo(seconds, 0.05);
+    },
+    setDelayFeedback(f) {
+      delay.feedback.rampTo(f, 0.05);
     }
   };
 }

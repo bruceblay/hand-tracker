@@ -1,7 +1,7 @@
 import '../../src/nav.js';
-import { createHandTracker } from '../../src/tracking.js';
+import { createHandTracker, createFaceTracker } from '../../src/tracking.js';
 import { createAudio } from './audio.js';
-import { drawHands } from '../../src/draw.js';
+import { drawHands, drawHandsNeon, drawFaceNeon, fadeCanvas } from '../../src/draw.js';
 import { quantizeToScale, midiToHz, OnePole, mirrorX } from '../../src/mappings.js';
 
 const video = document.getElementById('video');
@@ -48,6 +48,7 @@ async function run() {
 
   setHud('loading hand model…');
   const tracker = await createHandTracker({ numHands: 2 });
+  const faceTracker = await createFaceTracker();
 
   setHud('starting audio…');
   const audio = await createAudio();
@@ -68,6 +69,31 @@ async function run() {
     if (r.checked) pitchMode = r.value;
   }));
 
+  const bindSlider = (id, valId, format, apply) => {
+    const input = document.getElementById(id);
+    const val = document.getElementById(valId);
+    const update = () => {
+      const n = parseFloat(input.value);
+      val.textContent = format(n);
+      apply(n);
+    };
+    input.addEventListener('input', update);
+    update();
+  };
+  bindSlider('reverb-wet', 'reverb-wet-val', n => n.toFixed(2), n => audio.setReverbWet(n));
+  bindSlider('reverb-decay', 'reverb-decay-val', n => `${n.toFixed(1)}s`, n => audio.setReverbDecay(n));
+  bindSlider('delay-wet', 'delay-wet-val', n => n.toFixed(2), n => audio.setDelayWet(n));
+  bindSlider('delay-time', 'delay-time-val', n => `${Math.round(n * 1000)}ms`, n => audio.setDelayTime(n));
+  bindSlider('delay-feedback', 'delay-feedback-val', n => n.toFixed(2), n => audio.setDelayFeedback(n));
+
+  const stage = document.getElementById('stage');
+  let displayMode = 'normal';
+  document.querySelectorAll('input[name="display-mode"]').forEach(r => r.addEventListener('change', () => {
+    if (!r.checked) return;
+    displayMode = r.value;
+    stage.classList.toggle('rave', displayMode === 'rave');
+  }));
+
   let lastTs = -1;
   const loop = () => {
     if (video.readyState >= 2) {
@@ -77,7 +103,17 @@ async function run() {
         lastTs = ts;
         const { pitch, volume, all } = pickHands(result);
 
-        drawHands(ctx, all, { width: canvas.width, height: canvas.height });
+        if (displayMode === 'rave') {
+          const faceResult = faceTracker.detect(video, ts);
+          const faceLandmarks = (faceResult.faceLandmarks?.[0] ?? null);
+          const faceMirrored = faceLandmarks ? mirrorX(faceLandmarks) : null;
+          const hue = (ts / 18) % 360;
+          fadeCanvas(ctx, 0.09);
+          drawFaceNeon(ctx, faceMirrored, { width: canvas.width, height: canvas.height, hue: (hue + 180) % 360 });
+          drawHandsNeon(ctx, all, { width: canvas.width, height: canvas.height, hue });
+        } else {
+          drawHands(ctx, all, { width: canvas.width, height: canvas.height });
+        }
 
         if (pitch) {
           const tip = pitch[8];
