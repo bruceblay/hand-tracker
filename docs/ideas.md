@@ -12,4 +12,6 @@
 - better signature signer box
 - somthing with samples
 - globle spinner, interactive
-- 
+- 3d painter
+- patch cable grabber and placer
+- chrome extension to overlay hand tracker for standard ui.  pinch to click on any website
