@@ -35,7 +35,7 @@ async function startCamera() {
 function pickHands(result) {
   const hands = (result.landmarks ?? []).map(mirrorX);
   hands.sort((a, b) => a[0].x - b[0].x);
-  return { pitch: hands[0] ?? null, volume: hands[1] ?? null, all: hands };
+  return { volume: hands[0] ?? null, pitch: hands[1] ?? null, all: hands };
 }
 
 async function run() {
@@ -52,7 +52,7 @@ async function run() {
   setHud('starting audio…');
   const audio = await createAudio();
 
-  setHud('left side: y = pitch, x = resonance. right side: y = volume, x = filter cutoff.');
+  setHud('right hand: y = pitch, x = resonance. left hand: y = volume, x = filter cutoff.');
   audio.setVolume01(0.4);
 
   const controls = document.getElementById('controls');
@@ -61,6 +61,12 @@ async function run() {
   presetSelect.addEventListener('change', () => {
     audio.setPreset(presetSelect.value);
   });
+
+  let pitchMode = 'stepped';
+  const modeRadios = document.querySelectorAll('input[name="pitch-mode"]');
+  modeRadios.forEach(r => r.addEventListener('change', () => {
+    if (r.checked) pitchMode = r.value;
+  }));
 
   let lastTs = -1;
   const loop = () => {
@@ -76,7 +82,8 @@ async function run() {
         if (pitch) {
           const tip = pitch[8];
           const p01 = pitchSmoother.process(Math.max(0, Math.min(1, 1 - tip.y)));
-          audio.setPitchHz(midiToHz(quantizeToScale(p01)));
+          const midi = pitchMode === 'continuous' ? 48 + p01 * 34 : quantizeToScale(p01);
+          audio.setPitchHz(midiToHz(midi));
           const x = Math.max(0, Math.min(1, tip.x));
           const q = resonanceSmoother.process(x * 12);
           audio.setFilterQ(q);
