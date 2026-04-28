@@ -87,12 +87,18 @@ async function run() {
   bindSlider('delay-feedback', 'delay-feedback-val', n => n.toFixed(2), n => audio.setDelayFeedback(n));
 
   const stage = document.getElementById('stage');
-  let displayMode = 'normal';
-  document.querySelectorAll('input[name="display-mode"]').forEach(r => r.addEventListener('change', () => {
-    if (!r.checked) return;
-    displayMode = r.value;
-    stage.classList.toggle('trippy', displayMode === 'trippy');
-  }));
+  const initialTrippy = new URLSearchParams(window.location.search).get('isTrippy') === 'true';
+  let displayMode = initialTrippy ? 'trippy' : 'normal';
+  const displayRadios = document.querySelectorAll('input[name="display-mode"]');
+  displayRadios.forEach(r => {
+    r.checked = r.value === displayMode;
+    r.addEventListener('change', () => {
+      if (!r.checked) return;
+      displayMode = r.value;
+      stage.classList.toggle('trippy', displayMode === 'trippy');
+    });
+  });
+  stage.classList.toggle('trippy', displayMode === 'trippy');
 
   let lastTs = -1;
   const loop = () => {
