@@ -91,7 +91,7 @@ async function run() {
   document.querySelectorAll('input[name="display-mode"]').forEach(r => r.addEventListener('change', () => {
     if (!r.checked) return;
     displayMode = r.value;
-    stage.classList.toggle('rave', displayMode === 'rave');
+    stage.classList.toggle('trippy', displayMode === 'trippy');
   }));
 
   let lastTs = -1;
@@ -103,7 +103,7 @@ async function run() {
         lastTs = ts;
         const { pitch, volume, all } = pickHands(result);
 
-        if (displayMode === 'rave') {
+        if (displayMode === 'trippy') {
           const faceResult = faceTracker.detect(video, ts);
           const faceLandmarks = (faceResult.faceLandmarks?.[0] ?? null);
           const faceMirrored = faceLandmarks ? mirrorX(faceLandmarks) : null;
